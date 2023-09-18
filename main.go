@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gocolly/colly"
@@ -34,12 +35,12 @@ func get_fluc() (events){
         info := selection.Find("ul.info").Find("a[href]")
         switch days.Text() {
         case "Freitag":
-            fluc_ev.Day = days.Text()
-            fluc_ev.Info = info.Text()
+            fluc_ev.Day =  strings.TrimSpace(days.Text())
+            fluc_ev.Info = strings.TrimSpace(info.Text())
             fluc_events.Events = append(fluc_events.Events, fluc_ev)
         case "Samstag":
-            fluc_ev.Day = days.Text()
-            fluc_ev.Info = info.Text()
+            fluc_ev.Day =  strings.TrimSpace(days.Text())
+            fluc_ev.Info = strings.TrimSpace(info.Text())
             fluc_events.Events = append(fluc_events.Events, fluc_ev)
         default:
         }
