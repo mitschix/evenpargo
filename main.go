@@ -62,10 +62,73 @@ func get_fluc() ([]EV_Day){
     return fluc_events
 }
 
+func getWeekendDates() []time.Time {
+    var weekendDates []time.Time
+
+    // Aktuelles Datum und Wochentag abrufen
+    now := time.Now()
+    weekday := now.Weekday()
+
+    // Anzahl der Tage, um zum X zu gelangen
+    daysUntilFriday := time.Friday - weekday
+    daysUntilSaturday := time.Saturday - weekday
+    // fix sunday starting with 0
+    daysUntilSunday := time.Sunday + 7 - weekday
+
+    // Datum des nächsten X berechnen
+    friday := now.AddDate(0, 0, int(daysUntilFriday))
+    saturday := now.AddDate(0, 0, int(daysUntilSaturday))
+    sunday := now.AddDate(0, 0, int(daysUntilSunday))
+
+    weekendDates = append(weekendDates, friday, saturday, sunday)
+
+    return weekendDates
+}
+
+func get_fish() ([]EV_Day){
+    fish_events := []EV_Day{}
+
+    weekendDates := getWeekendDates()
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+	coll.OnHTML("div.project", func(h *colly.HTMLElement) {
+        selection := h.DOM
+        title := strings.TrimSpace(selection.Find("h2").Text())
+        for _, date := range weekendDates {
+            tmp_date := date.Format("02/01")
+            if strings.HasPrefix(title, tmp_date) {
+                found := false
+                for i, ev := range fish_events {
+                    if ev.Day == tmp_date {
+                        fish_events[i].Event = append(fish_events[i].Event, title)
+                        found = true
+                        break
+                    }
+                }
+                if !found {
+                    fish_ev := EV_Day{
+                        Host:  "Grelle Forelle",
+                        Day:   date.Weekday().String(),
+                        Event: []string{title},
+                    }
+                    fish_events = append(fish_events, fish_ev)
+                }
+            }
+        }
+	})
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+	coll.Visit("https://www.grelleforelle.com/programm/")
+    return fish_events
+}
+
 
 func main() {
     cur_events := events{}
-    fmt.Println("Get Fluc info.")
     cur_events.Events = append(cur_events.Events, get_fluc()...)
     cur_events.Events = append(cur_events.Events, get_fish()...)
 
