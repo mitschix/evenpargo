@@ -20,8 +20,8 @@ type EV_Day struct {
     Event []string `json:"event"`
 }
 
-func get_fluc() (events){
-    fluc_events := events{}
+func get_fluc() ([]EV_Day){
+    fluc_events := []EV_Day{}
 	tn := time.Now().UTC()
 	_, week := tn.ISOWeek()
 
@@ -49,7 +49,7 @@ func get_fluc() (events){
                 Day: day,
                 Event: strings.Split(info, "\n"),
             }
-            fluc_events.Events = append(fluc_events.Events, fluc_ev)
+            fluc_events = append(fluc_events, fluc_ev)
         }
 	})
 	coll.OnError(func(r *colly.Response, err error) {
@@ -61,9 +61,10 @@ func get_fluc() (events){
 
 
 func main() {
-    cur_events := []events{}
+    cur_events := events{}
     fmt.Println("Get Fluc info.")
-    cur_events = append(cur_events, get_fluc())
+    cur_events.Events = append(cur_events.Events, get_fluc()...)
+    cur_events.Events = append(cur_events.Events, get_fish()...)
 
 	content, err := json.MarshalIndent(cur_events, "", "  ")
 	if err != nil {
