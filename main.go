@@ -7,30 +7,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly"
 )
 
 type events struct {
+    Events []EV_Day `json:"host_events"`
+}
+
+type EV_Day struct {
     Host string `json:"host"`
-    Events []evday `json:"host_events"`
-}
-
-type evday struct {
     Day string `json:"day"`
-    Info []string `json:"info"`
-}
-
-func get_infos(info *goquery.Selection) ([]string){
-    var output []string
-    tmp := strings.TrimSpace(info.Text())
-    output = strings.Split(tmp, "\n")
-    return output
+    Event []string `json:"event"`
 }
 
 func get_fluc() (events){
     fluc_events := events{}
-    fluc_events.Host = "Fluc"
 	tn := time.Now().UTC()
 	_, week := tn.ISOWeek()
 
@@ -39,20 +30,26 @@ func get_fluc() (events){
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
 	})
 	coll.OnHTML("li.datum", func(h *colly.HTMLElement) {
-        fluc_ev := evday{}
+        is_weekend := false
+
         selection := h.DOM
-        days := selection.Find("span.tag")
-        info := selection.Find("ul.info").Find("li.wanne")
-        switch days.Text() {
-        case "Freitag":
-            fluc_ev.Day =  strings.TrimSpace(days.Text())
-            fluc_ev.Info = get_infos(info)
+        day := strings.TrimSpace(selection.Find("span.tag").Text())
+        info := strings.TrimSpace(selection.Find("ul.info").Find("li.wanne").Text())
+        switch day {
+            case "Freitag":
+                is_weekend = true
+            case "Samstag":
+                is_weekend = true
+            default:
+        }
+
+        if is_weekend && info != ""{
+            fluc_ev := EV_Day{
+                Host: "Fluc Wanne",
+                Day: day,
+                Event: strings.Split(info, "\n"),
+            }
             fluc_events.Events = append(fluc_events.Events, fluc_ev)
-        case "Samstag":
-            fluc_ev.Day =  strings.TrimSpace(days.Text())
-            fluc_ev.Info = get_infos(info)
-            fluc_events.Events = append(fluc_events.Events, fluc_ev)
-        default:
         }
 	})
 	coll.OnError(func(r *colly.Response, err error) {
@@ -68,7 +65,7 @@ func main() {
     fmt.Println("Get Fluc info.")
     cur_events = append(cur_events, get_fluc())
 
-	content, err := json.MarshalIndent(cur_events,"", "  ")
+	content, err := json.MarshalIndent(cur_events, "", "  ")
 	if err != nil {
 		fmt.Println(err)
 	}
