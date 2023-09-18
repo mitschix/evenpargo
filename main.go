@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -57,5 +59,14 @@ func main() {
     fmt.Println("Get Fluc info.")
     cur_events = append(cur_events, get_fluc())
 
-    fmt.Println(cur_events)
+	content, err := json.MarshalIndent(cur_events,"", "  ")
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = os.WriteFile("events.json", content, 0644)
+	if err != nil {
+        fmt.Println("Error writing file")
+	}
+
+    fmt.Println(string(content))
 }
