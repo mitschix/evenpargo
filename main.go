@@ -34,7 +34,7 @@ func get_fluc() (events){
         fluc_ev := evday{}
         selection := h.DOM
         days := selection.Find("span.tag")
-        info := selection.Find("ul.info").Find("a[href]")
+        info := selection.Find("ul.info").Find("li.wanne")
         switch days.Text() {
         case "Freitag":
             fluc_ev.Day =  strings.TrimSpace(days.Text())
