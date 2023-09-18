@@ -31,14 +31,17 @@ func get_fluc() ([]EV_Day){
 	})
 	coll.OnHTML("li.datum", func(h *colly.HTMLElement) {
         is_weekend := false
+        ev_day := ""
 
         selection := h.DOM
         day := strings.TrimSpace(selection.Find("span.tag").Text())
         info := strings.TrimSpace(selection.Find("ul.info").Find("li.wanne").Text())
         switch day {
             case "Freitag":
+                ev_day = "Friday"
                 is_weekend = true
             case "Samstag":
+                ev_day = "Saturday"
                 is_weekend = true
             default:
         }
@@ -46,7 +49,7 @@ func get_fluc() ([]EV_Day){
         if is_weekend && info != ""{
             fluc_ev := EV_Day{
                 Host: "Fluc Wanne",
-                Day: day,
+                Day: ev_day,
                 Event: strings.Split(info, "\n"),
             }
             fluc_events = append(fluc_events, fluc_ev)
