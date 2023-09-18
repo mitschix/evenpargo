@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly"
 )
 
@@ -17,7 +18,14 @@ type events struct {
 
 type evday struct {
     Day string `json:"day"`
-    Info string `json:"info"`
+    Info []string `json:"info"`
+}
+
+func get_infos(info *goquery.Selection) ([]string){
+    var output []string
+    tmp := strings.TrimSpace(info.Text())
+    output = strings.Split(tmp, "\n")
+    return output
 }
 
 func get_fluc() (events){
@@ -38,11 +46,11 @@ func get_fluc() (events){
         switch days.Text() {
         case "Freitag":
             fluc_ev.Day =  strings.TrimSpace(days.Text())
-            fluc_ev.Info = strings.TrimSpace(info.Text())
+            fluc_ev.Info = get_infos(info)
             fluc_events.Events = append(fluc_events.Events, fluc_ev)
         case "Samstag":
             fluc_ev.Day =  strings.TrimSpace(days.Text())
-            fluc_ev.Info = strings.TrimSpace(info.Text())
+            fluc_ev.Info = get_infos(info)
             fluc_events.Events = append(fluc_events.Events, fluc_ev)
         default:
         }
@@ -50,9 +58,10 @@ func get_fluc() (events){
 	coll.OnError(func(r *colly.Response, err error) {
 		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
 	})
-	coll.Visit(fmt.Sprintf("https://fluc.at/programm/2023_Flucwoche%d.html", week-1))
+	coll.Visit(fmt.Sprintf("https://fluc.at/programm/2023_Flucwoche%d.html", week))
     return fluc_events
 }
+
 
 func main() {
     cur_events := []events{}
