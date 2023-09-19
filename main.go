@@ -198,6 +198,52 @@ func get_exil() ([]EV_Day){
     return events
 }
 
+func get_werk() ([]EV_Day){
+    events := []EV_Day{}
+
+    weekendDates := getWeekendDates()
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+
+    coll.OnHTML("div.events--preview-item", func(h *colly.HTMLElement) {
+        ev_day := ""
+        selection := h.DOM
+        title := strings.TrimSpace(selection.Find(".preview-item--headline").Text())
+        day := selection.Find("ul.preview-item--information").Find("li:not([class])").First().Text()
+        time := selection.Find("ul.preview-item--information").Find("li:not([class])").Eq(1).Text()
+        time = strings.ReplaceAll(time, " Uhr", "")
+        location := selection.Find("p:not([class])").Text()
+        if location == "CLUB" {
+            switch {
+                case strings.HasPrefix(day, "Freitag"):
+                    ev_day = "Friday"
+                case strings.HasPrefix(day, "Samstag"):
+                    ev_day = "Saturday"
+                default:
+            }
+            for _, date := range weekendDates {
+                tmp_date := date.Format("2. January")
+                if ev_day == date.Weekday().String() && strings.Contains(day, tmp_date){
+                    events = add_event_info(events, "Werk", date.Weekday().String(),
+                        []string{fmt.Sprintf("%s: %s", time, title)})
+                }
+            }
+
+        }
+
+    })
+
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit("https://www.daswerk.org/programm/")
+    return events
+}
+
 
 func main() {
     cur_events := events{}
@@ -205,6 +251,7 @@ func main() {
     cur_events.Events = append(cur_events.Events, get_fish()...)
     cur_events.Events = append(cur_events.Events, get_flex()...)
     cur_events.Events = append(cur_events.Events, get_exil()...)
+    cur_events.Events = append(cur_events.Events, get_werk()...)
 
 	content, err := json.MarshalIndent(cur_events, "", "  ")
 	if err != nil {
