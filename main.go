@@ -151,7 +151,7 @@ func get_flex() ([]EV_Day){
                         time = strings.ReplaceAll(time, "\n", "")
                         title := strings.TrimSpace(sel_art.Find("h3.tribe-events-calendar-month__calendar-event-title").Text())
                         events = add_event_info(events, "Flex", date.Weekday().String(),
-                            []string{fmt.Sprintf("%s %s", time, title)})
+                            []string{fmt.Sprintf("%s: %s", time, title)})
                     })
 
                 })
@@ -179,13 +179,13 @@ func get_exil() ([]EV_Day){
     coll.OnHTML("tr.container", func(h *colly.HTMLElement) {
         selection := h.DOM
         title := strings.TrimSpace(selection.Find("h3").Text())
-        date := selection.Find("ul.list-eventinfos").Find("li").First()
-        day := date.Find("span:not([class])").First()
+        day := selection.Find("span:not([class])").First().Text()
+        time := selection.Find("span:not([class])").Eq(1).Text()
         for _, date := range weekendDates {
             tmp_date := date.Format("02/01/2006")
-            if strings.Contains(day.Text(), tmp_date){
+            if strings.Contains(day, tmp_date){
                 events = add_event_info(events, "Exil", date.Weekday().String(),
-                    []string{fmt.Sprintf("%s %s", day.Text(), title)})
+                    []string{fmt.Sprintf("%s: %s", time, title)})
             }
         }
     })
