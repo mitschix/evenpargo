@@ -101,8 +101,8 @@ func get_fish() ([]EV_Day){
             tmp_date := date.Format("02/01")
             if strings.HasPrefix(title, tmp_date) {
                 found := false
-                    if ev.Day == tmp_date {
                 for i, ev := range events {
+                    if ev.Day == date.Weekday().String() {
                         events[i].Event = append(events[i].Event, title)
                         found = true
                         break
