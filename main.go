@@ -21,6 +21,26 @@ type EV_Day struct {
     Event []string `json:"event"`
 }
 
+func add_event_info(events []EV_Day, host string, day string, event_info []string) ([]EV_Day){
+    found := false
+    for i, ev := range events {
+        if ev.Day == day {
+            events[i].Event = append(events[i].Event, event_info...)
+            found = true
+            break
+        }
+    }
+    if !found {
+        eve := EV_Day{
+            Host:  host,
+            Day:   day,
+            Event: event_info,
+        }
+        events = append(events, eve)
+    }
+    return events
+}
+
 func get_fluc() ([]EV_Day){
     events := []EV_Day{}
 	tn := time.Now().UTC()
@@ -48,12 +68,7 @@ func get_fluc() ([]EV_Day){
         }
 
         if is_weekend && info != ""{
-            eve := EV_Day{
-                Host: "Fluc Wanne",
-                Day: ev_day,
-                Event: strings.Split(info, "\n"),
-            }
-            events = append(events, eve)
+            events = add_event_info(events, "Fluc Wanne", ev_day, strings.Split(info, "\n"))
         }
 	})
 	coll.OnError(func(r *colly.Response, err error) {
@@ -101,22 +116,7 @@ func get_fish() ([]EV_Day){
         for _, date := range weekendDates {
             tmp_date := date.Format("02/01")
             if strings.HasPrefix(title, tmp_date) {
-                found := false
-                for i, ev := range events {
-                    if ev.Day == date.Weekday().String() {
-                        events[i].Event = append(events[i].Event, title)
-                        found = true
-                        break
-                    }
-                }
-                if !found {
-                    eve := EV_Day{
-                        Host:  "Grelle Forelle",
-                        Day:   date.Weekday().String(),
-                        Event: []string{title},
-                    }
-                    events = append(events, eve)
-                }
+                events = add_event_info(events, "Grelle Forelle", date.Weekday().String(), []string{title})
             }
         }
 	})
@@ -150,22 +150,8 @@ func get_flex() ([]EV_Day){
                         time = strings.ReplaceAll(time, "\t", "")
                         time = strings.ReplaceAll(time, "\n", "")
                         title := strings.TrimSpace(sel_art.Find("h3.tribe-events-calendar-month__calendar-event-title").Text())
-                        found := false
-                        for i, ev := range events {
-                            if ev.Day == date.Weekday().String() {
-                                events[i].Event = append(events[i].Event, fmt.Sprintf("%s %s", time, title))
-                                found = true
-                                break
-                            }
-                        }
-                        if !found {
-                            eve := EV_Day{
-                                Host:  "Flex",
-                                Day:   date.Weekday().String(),
-                                Event: []string{fmt.Sprintf("%s %s", time, title)},
-                            }
-                            events = append(events, eve)
-                        }
+                        events = add_event_info(events, "Flex", date.Weekday().String(),
+                            []string{fmt.Sprintf("%s %s", time, title)})
                     })
 
                 })
@@ -180,11 +166,45 @@ func get_flex() ([]EV_Day){
 }
 
 
+func get_exil() ([]EV_Day){
+    events := []EV_Day{}
+
+    weekendDates := getWeekendDates()
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+
+    coll.OnHTML("tr.container", func(h *colly.HTMLElement) {
+        selection := h.DOM
+        title := strings.TrimSpace(selection.Find("h3").Text())
+        date := selection.Find("ul.list-eventinfos").Find("li").First()
+        day := date.Find("span:not([class])").First()
+        for _, date := range weekendDates {
+            tmp_date := date.Format("02/01/2006")
+            if strings.Contains(day.Text(), tmp_date){
+                events = add_event_info(events, "Exil", date.Weekday().String(),
+                    []string{fmt.Sprintf("%s %s", day.Text(), title)})
+            }
+        }
+    })
+
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit("https://exil1.ticket.io/")
+    return events
+}
+
+
 func main() {
     cur_events := events{}
     cur_events.Events = append(cur_events.Events, get_fluc()...)
     cur_events.Events = append(cur_events.Events, get_fish()...)
     cur_events.Events = append(cur_events.Events, get_flex()...)
+    cur_events.Events = append(cur_events.Events, get_exil()...)
 
 	content, err := json.MarshalIndent(cur_events, "", "  ")
 	if err != nil {
