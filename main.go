@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly"
 )
 
@@ -127,10 +128,63 @@ func get_fish() ([]EV_Day){
 }
 
 
+func get_flex() ([]EV_Day){
+    events := []EV_Day{}
+
+    weekendDates := getWeekendDates()
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+
+    coll.OnHTML("div.tribe-events-calendar-month__day", func(h *colly.HTMLElement) {
+        selection := h.DOM
+        for _, date := range weekendDates {
+            tmp_date := date.Format("2006-01-02")
+            selection.Find(fmt.Sprintf("div#tribe-events-calendar-day-%s", tmp_date)).Each(
+                func(_ int, sel_day *goquery.Selection) {
+                    sel_day.Find("article.tribe-events-calendar-month__calendar-event").Each(
+                        func(_ int, sel_art *goquery.Selection) {
+                        time := strings.TrimSpace(sel_art.Find("div.tribe-events-calendar-month__calendar-event-datetime").Text())
+                        time = strings.ReplaceAll(time, "\t", "")
+                        time = strings.ReplaceAll(time, "\n", "")
+                        title := strings.TrimSpace(sel_art.Find("h3.tribe-events-calendar-month__calendar-event-title").Text())
+                        found := false
+                        for i, ev := range events {
+                            if ev.Day == date.Weekday().String() {
+                                events[i].Event = append(events[i].Event, fmt.Sprintf("%s %s", time, title))
+                                found = true
+                                break
+                            }
+                        }
+                        if !found {
+                            eve := EV_Day{
+                                Host:  "Flex",
+                                Day:   date.Weekday().String(),
+                                Event: []string{fmt.Sprintf("%s %s", time, title)},
+                            }
+                            events = append(events, eve)
+                        }
+                    })
+
+                })
+            }
+    })
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit("https://flex.at/events/monat/")
+    return events
+}
+
+
 func main() {
     cur_events := events{}
     cur_events.Events = append(cur_events.Events, get_fluc()...)
     cur_events.Events = append(cur_events.Events, get_fish()...)
+    cur_events.Events = append(cur_events.Events, get_flex()...)
 
 	content, err := json.MarshalIndent(cur_events, "", "  ")
 	if err != nil {
