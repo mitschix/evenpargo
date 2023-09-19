@@ -21,7 +21,7 @@ type EV_Day struct {
 }
 
 func get_fluc() ([]EV_Day){
-    fluc_events := []EV_Day{}
+    events := []EV_Day{}
 	tn := time.Now().UTC()
 	_, week := tn.ISOWeek()
 
@@ -47,19 +47,19 @@ func get_fluc() ([]EV_Day){
         }
 
         if is_weekend && info != ""{
-            fluc_ev := EV_Day{
+            eve := EV_Day{
                 Host: "Fluc Wanne",
                 Day: ev_day,
                 Event: strings.Split(info, "\n"),
             }
-            fluc_events = append(fluc_events, fluc_ev)
+            events = append(events, eve)
         }
 	})
 	coll.OnError(func(r *colly.Response, err error) {
 		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
 	})
 	coll.Visit(fmt.Sprintf("https://fluc.at/programm/2023_Flucwoche%d.html", week))
-    return fluc_events
+    return events
 }
 
 func getWeekendDates() []time.Time {
@@ -86,7 +86,7 @@ func getWeekendDates() []time.Time {
 }
 
 func get_fish() ([]EV_Day){
-    fish_events := []EV_Day{}
+    events := []EV_Day{}
 
     weekendDates := getWeekendDates()
 
@@ -101,20 +101,20 @@ func get_fish() ([]EV_Day){
             tmp_date := date.Format("02/01")
             if strings.HasPrefix(title, tmp_date) {
                 found := false
-                for i, ev := range fish_events {
                     if ev.Day == tmp_date {
-                        fish_events[i].Event = append(fish_events[i].Event, title)
+                for i, ev := range events {
+                        events[i].Event = append(events[i].Event, title)
                         found = true
                         break
                     }
                 }
                 if !found {
-                    fish_ev := EV_Day{
+                    eve := EV_Day{
                         Host:  "Grelle Forelle",
                         Day:   date.Weekday().String(),
                         Event: []string{title},
                     }
-                    fish_events = append(fish_events, fish_ev)
+                    events = append(events, eve)
                 }
             }
         }
@@ -123,7 +123,7 @@ func get_fish() ([]EV_Day){
 		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
 	})
 	coll.Visit("https://www.grelleforelle.com/programm/")
-    return fish_events
+    return events
 }
 
 
