@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -328,6 +329,49 @@ func get_loft() ([]EV_Day){
     return events
 }
 
+func get_black() ([]EV_Day){
+    events := []EV_Day{}
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+
+    coll.OnHTML("p:not([class])", func(h *colly.HTMLElement) {
+        info := h.DOM.Text()
+        for _, date := range weekendDates {
+            tmp_date := date.Format("02.01.06")
+            if strings.Contains(info, tmp_date){
+                splitted := strings.Split(info, " // ")
+                if len(splitted) != 3 {
+                    fmt.Println("[e] could not parse blackmarket info")
+                    return
+                }
+                title, ev_time := splitted[1], splitted[2]
+                ev_time = strings.ReplaceAll(ev_time, " UHR", "")
+                split_time := strings.Split(ev_time, "-")
+                if len(split_time) != 2{
+                    fmt.Println("[e] could not parse blackmarket time")
+                    return
+                }
+                start, _ := strconv.Atoi(split_time[0])
+                end, _ := strconv.Atoi(split_time[1])
+                full_title := fmt.Sprintf("%02d:00-%02d:00: %s", start, end, title)
+                events = add_event_info(events, "Black Market", date.Weekday().String(),
+                    []string{full_title})
+                }
+        }
+    })
+
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit("http://www.blackmarket.at/?page_id=49")
+    return events
+}
+
+
 func get_freytag(club string) ([]EV_Day){
     events := []EV_Day{}
 
@@ -373,6 +417,7 @@ func main() {
     cur_events.Events = append(cur_events.Events, get_exil()...)
     cur_events.Events = append(cur_events.Events, get_werk()...)
     cur_events.Events = append(cur_events.Events, get_loft()...)
+    cur_events.Events = append(cur_events.Events, get_black()...)
     frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen"}
     for _, club_name := range frey_clubs {
         cur_events.Events = append(cur_events.Events, get_freytag(club_name)...)
