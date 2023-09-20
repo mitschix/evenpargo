@@ -274,6 +274,39 @@ func get_hot() ([]EV_Day){
 	coll.Visit("https://pratersauna.tv/programm/")
     return events
 }
+
+func get_loft() ([]EV_Day){
+    events := []EV_Day{}
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+
+    coll.OnHTML("div.box-wrap", func(h *colly.HTMLElement) {
+        selection := h.DOM
+        day := strings.TrimSpace(selection.Find("div.datum").Text())
+        time := strings.TrimSpace(selection.Find("span.open").Text())
+        title := strings.TrimSpace(selection.Find("div.content-middle").Text())
+        location := strings.TrimSpace(selection.Find("div.content-right").Text())
+        for _, date := range weekendDates {
+            tmp_date := date.Format("02.1.2006")
+            if strings.Contains(day, tmp_date){
+                full_title := fmt.Sprintf("%s: %s (%s)", time, title, location)
+                events = add_event_info(events, "theLoft", date.Weekday().String(),
+                    []string{full_title})
+            }
+        }
+    })
+
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit("https://www.theloft.at/programm/")
+    return events
+}
+
 func main() {
     weekendDates = getWeekendDates()
     cur_events := events{}
@@ -282,6 +315,7 @@ func main() {
     cur_events.Events = append(cur_events.Events, get_flex()...)
     cur_events.Events = append(cur_events.Events, get_exil()...)
     cur_events.Events = append(cur_events.Events, get_werk()...)
+    cur_events.Events = append(cur_events.Events, get_loft()...)
 
 	content, err := json.MarshalIndent(cur_events, "", "  ")
 	if err != nil {

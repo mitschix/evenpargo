@@ -11,3 +11,4 @@ Currently parsed websites:
 - [Exil](https://exil1.ticket.io/)
 - [dasWerk](https://www.daswerk.org/programm/)
 - [Pratersauna](https://pratersauna.tv/programm/)
+- [theLoft](https://www.theloft.at/programm/)
