@@ -111,12 +111,33 @@ func get_fish() ([]EV_Day){
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
 	})
 	coll.OnHTML("div.project", func(h *colly.HTMLElement) {
+        ev_time := ""
         selection := h.DOM
-        title := strings.TrimSpace(selection.Find("h2").Text())
+        ev_text := selection.Find("h2")
+        full_text := ev_text.Text()
         for _, date := range weekendDates {
             tmp_date := date.Format("02/01")
-            if strings.HasPrefix(title, tmp_date) {
-                events = add_event_info(events, "Grelle Forelle", date.Weekday().String(), []string{title})
+            if strings.HasPrefix(full_text, tmp_date) {
+
+                ev_link := ev_text.Find("a[href]")
+                link, exists := ev_link.Attr("href")
+                if exists {
+                    coll.OnHTML("div.et_pb_text",func(h *colly.HTMLElement) {
+                        link_sel := h.DOM
+                        link_sel.Find("p:not([class])").Each(func(_ int, s *goquery.Selection) {
+                            cur_text := s.Text()
+                            if strings.Contains(cur_text, "DOORS") {
+                                ev_time = cur_text
+                            }
+                        })
+                    })
+                    coll.Visit(h.Request.AbsoluteURL(link))
+                }
+
+                title := strings.TrimSpace(strings.Trim(full_text, tmp_date))
+                ev_time = strings.Trim(ev_time, "DORS \n")
+                ev_title := fmt.Sprintf("%s: %s", ev_time, title)
+                events = add_event_info(events, "Grelle Forelle", date.Weekday().String(), []string{ev_title})
             }
         }
 	})
