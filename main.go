@@ -21,6 +21,8 @@ type EV_Day struct {
     Event []string `json:"event"`
 }
 
+var weekendDates []time.Time
+
 func add_event_info(events []EV_Day, host string, day string, event_info []string) ([]EV_Day){
     found := false
     for i, ev := range events {
@@ -104,8 +106,6 @@ func getWeekendDates() []time.Time {
 func get_fish() ([]EV_Day){
     events := []EV_Day{}
 
-    weekendDates := getWeekendDates()
-
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
@@ -130,8 +130,6 @@ func get_fish() ([]EV_Day){
 
 func get_flex() ([]EV_Day){
     events := []EV_Day{}
-
-    weekendDates := getWeekendDates()
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -169,8 +167,6 @@ func get_flex() ([]EV_Day){
 func get_exil() ([]EV_Day){
     events := []EV_Day{}
 
-    weekendDates := getWeekendDates()
-
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
@@ -201,8 +197,6 @@ func get_exil() ([]EV_Day){
 func get_werk() ([]EV_Day){
     events := []EV_Day{}
 
-    weekendDates := getWeekendDates()
-
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
@@ -227,7 +221,7 @@ func get_werk() ([]EV_Day){
             for _, date := range weekendDates {
                 tmp_date := date.Format("2. January")
                 if ev_day == date.Weekday().String() && strings.Contains(day, tmp_date){
-                    events = add_event_info(events, "Werk", date.Weekday().String(),
+                    events = add_event_info(events, "dasWerk", date.Weekday().String(),
                         []string{fmt.Sprintf("%s: %s", time, title)})
                 }
             }
@@ -246,6 +240,7 @@ func get_werk() ([]EV_Day){
 
 
 func main() {
+    weekendDates = getWeekendDates()
     cur_events := events{}
     cur_events.Events = append(cur_events.Events, get_fluc()...)
     cur_events.Events = append(cur_events.Events, get_fish()...)
