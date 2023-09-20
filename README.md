@@ -12,6 +12,13 @@ Currently parsed websites:
 - [Pratersauna](https://pratersauna.tv/programm/)
 - [theLoft](https://www.theloft.at/programm/)
 
+Parsed via [frey-tag.at](https://frey-tag.at/locations/) (an amazing website containing all necessary
+information in a beautiful (and parseable) manner) for different reasons:
+ - [Kramladen](https://frey-tag.at/locations/kramladen) -> website down / no website
+ - [Praterstrasse/PRST](https://frey-tag.at/locations/club-praterstrasse) -> club=IG
+ - [ponyhof](https://frey-tag.at/locations/ponyhof) -> website=IG
+ - [club-u](https://frey-tag.at/locations/club-u) -> broken site (no events)
+
 To come:
 - [O-Klub](https://shop.eventjet.at/o-vienna)
 - [BlackMarket](http://www.blackmarket.at/?page_id=49)
@@ -19,10 +26,3 @@ To come:
 - [Rhiz](https://rhiz.wien/programm/)
 - [SASS](https://sassvienna.com/programm)
 - [USUS](https://amwasser.wien/events)
-
-Parsed via [frey-tag.at](https://frey-tag.at/locations/) (an amazing website containing all necessary
-information in a beautiful (and parseable) manner) for different reasons:
- - Kramladen -> website down / no website
- - Praterstrasse/PRST -> club=IG
- - derponyhof -> website=IG
- - club-u -> broken site (no events)
