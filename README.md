@@ -1,8 +1,7 @@
 # \[Even]t \[par]ser in \[go]
 
-Little script to learn go and scrape data from clubs in vienna to show the upcoming events.
-
-Target is to output a json to feed to a bot/web page to display them nicely.
+Little script to learn go and scrape data from club websites in vienna to show the upcoming events.
+Target is to output a json file to feed to a bot/web page to display them nicely.
 
 Currently parsed websites:
 - [Fluc Wanne](https://fluc.at/programm/2023_Flucwoche%d.html)
@@ -12,3 +11,17 @@ Currently parsed websites:
 - [dasWerk](https://www.daswerk.org/programm/)
 - [Pratersauna](https://pratersauna.tv/programm/)
 - [theLoft](https://www.theloft.at/programm/)
+To come:
+- [O-Klub](https://shop.eventjet.at/o-vienna)
+- [BlackMarket](http://www.blackmarket.at/?page_id=49)
+- [B72](https://www.b72.at/program)
+- [Rhiz](https://rhiz.wien/programm/)
+- [SASS](https://sassvienna.com/programm)
+- [USUS](https://amwasser.wien/events)
+
+Parsed via [frey-tag.at](https://frey-tag.at/locations/) (an amazing website containing all necessary
+information in a beautiful (and parseable) manner) for different reasons:
+ - Kramladen -> website down / no website
+ - Praterstrasse/PRST -> Club=IG
+ - derponyhof -> website=IG
+ - club-u -> broken site (no events)

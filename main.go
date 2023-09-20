@@ -307,6 +307,42 @@ func get_loft() ([]EV_Day){
     return events
 }
 
+func get_freytag(club string) ([]EV_Day){
+    events := []EV_Day{}
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+
+    coll.OnHTML("div.listKalender_Event__14qVM", func(h *colly.HTMLElement) {
+        selection := h.DOM
+        day := strings.TrimSpace(selection.Find("span.listKalender_EventDate__hz06c").Text())
+        time := strings.TrimSpace(selection.Find("div.listKalender_EventTime__3Xw8c").Text())
+        title := strings.TrimSpace(selection.Find("h2").Text())
+        sub_title := strings.TrimSpace(selection.Find("h3").Text())
+        if sub_title != ""{
+            sub_title = " " + sub_title
+        }
+        location := strings.TrimSpace(selection.Find("span.listKalender_EventLocation__2vPrT").Text())
+        for _, date := range weekendDates {
+            tmp_date := date.Format("02.01.2006")
+            if day == tmp_date{
+                full_title := fmt.Sprintf("%s: %s%s", time, title, sub_title)
+                events = add_event_info(events, location, date.Weekday().String(),
+                    []string{full_title})
+            }
+        }
+    })
+
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit(fmt.Sprintf("https://frey-tag.at/locations/%s",club))
+    return events
+}
+
 func main() {
     weekendDates = getWeekendDates()
     cur_events := events{}
@@ -316,6 +352,10 @@ func main() {
     cur_events.Events = append(cur_events.Events, get_exil()...)
     cur_events.Events = append(cur_events.Events, get_werk()...)
     cur_events.Events = append(cur_events.Events, get_loft()...)
+    frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen"}
+    for _, club_name := range frey_clubs {
+        cur_events.Events = append(cur_events.Events, get_freytag(club_name)...)
+    }
 
 	content, err := json.MarshalIndent(cur_events, "", "  ")
 	if err != nil {
