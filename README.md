@@ -11,6 +11,7 @@ Currently parsed websites:
 - [dasWerk](https://www.daswerk.org/programm/)
 - [Pratersauna](https://pratersauna.tv/programm/)
 - [theLoft](https://www.theloft.at/programm/)
+
 To come:
 - [O-Klub](https://shop.eventjet.at/o-vienna)
 - [BlackMarket](http://www.blackmarket.at/?page_id=49)
@@ -22,6 +23,6 @@ To come:
 Parsed via [frey-tag.at](https://frey-tag.at/locations/) (an amazing website containing all necessary
 information in a beautiful (and parseable) manner) for different reasons:
  - Kramladen -> website down / no website
- - Praterstrasse/PRST -> Club=IG
+ - Praterstrasse/PRST -> club=IG
  - derponyhof -> website=IG
  - club-u -> broken site (no events)

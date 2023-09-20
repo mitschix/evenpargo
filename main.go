@@ -18,7 +18,7 @@ type events struct {
 type EV_Day struct {
     Host string `json:"host"`
     Day string `json:"day"`
-    Event []string `json:"event"`
+    Events []string `json:"events"`
 }
 
 var weekendDates []time.Time
@@ -27,7 +27,7 @@ func add_event_info(events []EV_Day, host string, day string, event_info []strin
     found := false
     for i, ev := range events {
         if ev.Day == day {
-            events[i].Event = append(events[i].Event, event_info...)
+            events[i].Events = append(events[i].Events, event_info...)
             found = true
             break
         }
@@ -36,7 +36,7 @@ func add_event_info(events []EV_Day, host string, day string, event_info []strin
         eve := EV_Day{
             Host:  host,
             Day:   day,
-            Event: event_info,
+            Events: event_info,
         }
         events = append(events, eve)
     }
