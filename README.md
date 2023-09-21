@@ -15,13 +15,13 @@ Currently parsed websites:
 
 Parsed via [frey-tag.at](https://frey-tag.at/locations/) (an amazing website containing all necessary
 information in a beautiful (and parseable) manner) for different reasons:
- - [Kramladen](https://frey-tag.at/locations/kramladen) -> website down / no website
- - [Praterstrasse/PRST](https://frey-tag.at/locations/club-praterstrasse) -> club=IG
- - [ponyhof](https://frey-tag.at/locations/ponyhof) -> website=IG
- - [club-u](https://frey-tag.at/locations/club-u) -> broken site (no events)
+- [Kramladen](https://frey-tag.at/locations/kramladen) -> website down / no website
+- [Praterstrasse/PRST](https://frey-tag.at/locations/club-praterstrasse) -> club=IG
+- [ponyhof](https://frey-tag.at/locations/ponyhof) -> website=IG
+- [club-u](https://frey-tag.at/locations/club-u) -> broken site (no events)
+- [O-Klub](https://frey-tag.at/locations/o-der-klub) -> 'website=facebook' -> [Ticket Shop](https://shop.eventjet.at/o-vienna) does not contain all events
 
 To come:
-- [O-Klub](https://shop.eventjet.at/o-vienna)
 - [B72](https://www.b72.at/program)
 - [Rhiz](https://rhiz.wien/programm/)
 - [SASS](https://sassvienna.com/programm)

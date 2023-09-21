@@ -432,7 +432,7 @@ func get_all_events() (events){
 
 
     // run freytag separate since it has args -> also as gorotines
-    frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen"}
+    frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen", "o-der-klub"}
     for _, club_name := range frey_clubs {
         go func(club string) {
             eventChan <- get_freytag(club)
