@@ -408,20 +408,48 @@ func get_freytag(club string) ([]EV_Day){
     return events
 }
 
-func main() {
-    weekendDates = getWeekendDates()
+func get_all_events() (events){
     cur_events := events{}
-    cur_events.Events = append(cur_events.Events, get_fluc()...)
-    cur_events.Events = append(cur_events.Events, get_fish()...)
-    cur_events.Events = append(cur_events.Events, get_flex()...)
-    cur_events.Events = append(cur_events.Events, get_exil()...)
-    cur_events.Events = append(cur_events.Events, get_werk()...)
-    cur_events.Events = append(cur_events.Events, get_loft()...)
-    cur_events.Events = append(cur_events.Events, get_black()...)
+
+    eventChan := make(chan []EV_Day)
+
+    functions := []func() []EV_Day{
+        get_fluc,
+        get_fish,
+        get_flex,
+        get_exil,
+        get_werk,
+        get_loft,
+        get_black,
+    }
+
+    // run funcs in goroutine without argument
+    for _, fn := range functions {
+        go func(f func() []EV_Day) {
+            eventChan <- f()
+        }(fn)
+    }
+
+
+    // run freytag separate since it has args -> also as gorotines
     frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen"}
     for _, club_name := range frey_clubs {
-        cur_events.Events = append(cur_events.Events, get_freytag(club_name)...)
+        go func(club string) {
+            eventChan <- get_freytag(club)
+        }(club_name)
     }
+
+    for i := 0; i < len(functions) + len(frey_clubs); i++ {
+        cur_events.Events = append(cur_events.Events, <-eventChan...)
+    }
+
+    return cur_events
+
+}
+
+func main() {
+    weekendDates = getWeekendDates()
+    cur_events := get_all_events()
 
 	content, err := json.MarshalIndent(cur_events, "", "  ")
 	if err != nil {
