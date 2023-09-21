@@ -371,6 +371,43 @@ func get_black() ([]EV_Day){
     return events
 }
 
+func get_rhiz() ([]EV_Day){
+    events := []EV_Day{}
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+
+    coll.OnHTML("div:grid-item", func(h *colly.HTMLElement) {
+        selection := h.DOM
+        day := strings.TrimSpace(selection.Find("div.event-date").Text())
+        for _, date := range weekendDates {
+            tmp_date := date.Format("020106")
+            if strings.Contains(day, tmp_date){
+                splitted := strings.Split(day, " ")
+                if len(splitted) != 3 {
+                    fmt.Println("[e] could not parse blackmarket info")
+                    return
+                }
+                time := splitted[2]
+                title := strings.TrimSpace(selection.Find("h3").Text())
+
+                full_title := fmt.Sprintf("%s: %s", time, title)
+                events = add_event_info(events, "rhiz", date.Weekday().String(),
+                    []string{full_title})
+                }
+        }
+    })
+
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit("https://rhiz.wien/programm/")
+    return events
+}
+
 
 func get_freytag(club string) ([]EV_Day){
     events := []EV_Day{}
@@ -414,13 +451,14 @@ func get_all_events() (events){
     eventChan := make(chan []EV_Day)
 
     functions := []func() []EV_Day{
-        get_fluc,
-        get_fish,
-        get_flex,
-        get_exil,
-        get_werk,
-        get_loft,
-        get_black,
+        // get_fluc,
+        // get_fish,
+        // get_flex,
+        // get_exil,
+        // get_werk,
+        // get_loft,
+        // get_black,
+        get_rhiz,
     }
 
     // run funcs in goroutine without argument

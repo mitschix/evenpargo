@@ -12,6 +12,7 @@ Currently parsed websites:
 - [Pratersauna](https://pratersauna.tv/programm/)
 - [theLoft](https://www.theloft.at/programm/)
 - [BlackMarket](http://www.blackmarket.at/?page_id=49)
+- [Rhiz](https://rhiz.wien/programm/)
 
 Parsed via [frey-tag.at](https://frey-tag.at/locations/) (an amazing website containing all necessary
 information in a beautiful (and parseable) manner) for different reasons:
@@ -23,6 +24,5 @@ information in a beautiful (and parseable) manner) for different reasons:
 
 To come:
 - [B72](https://www.b72.at/program)
-- [Rhiz](https://rhiz.wien/programm/)
 - [SASS](https://sassvienna.com/programm)
 - [USUS](https://amwasser.wien/events)
