@@ -387,7 +387,7 @@ func get_rhiz() ([]EV_Day){
             if strings.Contains(day, tmp_date){
                 splitted := strings.Split(day, " ")
                 if len(splitted) != 3 {
-                    fmt.Println("[e] could not parse blackmarket info")
+                    fmt.Println("[e] could not parse rhiz info")
                     return
                 }
                 time := splitted[2]
@@ -405,6 +405,44 @@ func get_rhiz() ([]EV_Day){
 	})
 
 	coll.Visit("https://rhiz.wien/programm/")
+    return events
+}
+
+func get_sass() ([]EV_Day){
+    events := []EV_Day{}
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+
+    coll.OnHTML("div.event", func(h *colly.HTMLElement) {
+        selection := h.DOM
+        day := strings.TrimSpace(selection.Find("span.start_date").Text())
+        for _, date := range weekendDates {
+            tmp_date := date.Format("02. Jan")
+            if strings.Contains(day, tmp_date){
+
+                start := strings.TrimSpace(selection.Find("span.start_time").Text())
+                end := strings.TrimSpace(selection.Find("span.end_time").Text())
+                title := strings.TrimSpace(selection.Find("div.title").Text())
+                sub_title := strings.TrimSpace(selection.Find("div.subline").Text())
+                if sub_title != ""{
+                    sub_title = " " + sub_title
+                }
+
+                full_title := fmt.Sprintf("%s-%s: %s%s", start, end, title, sub_title)
+                events = add_event_info(events, "SASS", date.Weekday().String(),
+                    []string{full_title})
+                }
+        }
+    })
+
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit("https://sassvienna.com/programm")
     return events
 }
 
@@ -451,14 +489,15 @@ func get_all_events() (events){
     eventChan := make(chan []EV_Day)
 
     functions := []func() []EV_Day{
-        // get_fluc,
-        // get_fish,
-        // get_flex,
-        // get_exil,
-        // get_werk,
-        // get_loft,
-        // get_black,
+        get_fluc,
+        get_fish,
+        get_flex,
+        get_exil,
+        get_werk,
+        get_loft,
+        get_black,
         get_rhiz,
+        get_sass,
     }
 
     // run funcs in goroutine without argument
