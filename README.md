@@ -14,6 +14,7 @@ Currently parsed websites:
 - [BlackMarket](http://www.blackmarket.at/?page_id=49)
 - [Rhiz](https://rhiz.wien/programm/)
 - [SASS](https://sassvienna.com/programm)
+- [B72](https://www.b72.at/program)
 
 Parsed via [frey-tag.at](https://frey-tag.at/locations/) (an amazing website containing all necessary
 information in a beautiful (and parseable) manner) for different reasons:
@@ -24,5 +25,4 @@ information in a beautiful (and parseable) manner) for different reasons:
 - [O-Klub](https://frey-tag.at/locations/o-der-klub) -> 'website=facebook' -> [Ticket Shop](https://shop.eventjet.at/o-vienna) does not contain all events
 
 To come:
-- [B72](https://www.b72.at/program)
 - [USUS](https://amwasser.wien/events)

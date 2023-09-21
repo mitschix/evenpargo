@@ -446,6 +446,56 @@ func get_sass() ([]EV_Day){
     return events
 }
 
+func get_b72() ([]EV_Day){
+    events := []EV_Day{}
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+
+    coll.OnHTML("div.coming-up", func(h *colly.HTMLElement) {
+        ev_time := ""
+        selection := h.DOM
+        day := strings.TrimSpace(selection.Find("h4").Text())
+        for _, date := range weekendDates {
+            tmp_date := date.Format("02.01")
+            if tmp_date == day{
+                title := selection.Find("h6")
+
+                ev_link := title.Find("a[href]")
+                link, exists := ev_link.Attr("href")
+                if exists {
+                    coll.OnHTML("div.show-detail",func(h *colly.HTMLElement) {
+                        link_sel := h.DOM
+                        link_sel.Find("b:not([class])").Each(func(_ int, s *goquery.Selection) {
+                            cur_text := s.Text()
+                            splitted := strings.Split(cur_text, " ")
+                            if len(splitted) != 2 {
+                                fmt.Println("[e] could not parse b72 time")
+                                return
+                            }
+                            ev_time = splitted[1]
+                        })
+                    })
+                    coll.Visit(h.Request.AbsoluteURL(link))
+                }
+                title_text := strings.TrimSpace(title.Text())
+                full_title := fmt.Sprintf("%s: %s", ev_time, title_text)
+                events = add_event_info(events, "B72", date.Weekday().String(),
+                    []string{full_title})
+                }
+        }
+    })
+
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit("https://www.b72.at/program")
+    return events
+}
+
 
 func get_freytag(club string) ([]EV_Day){
     events := []EV_Day{}
@@ -498,6 +548,7 @@ func get_all_events() (events){
         get_black,
         get_rhiz,
         get_sass,
+        get_b72,
     }
 
     // run funcs in goroutine without argument
