@@ -379,7 +379,7 @@ func get_rhiz() ([]EV_Day){
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
 	})
 
-    coll.OnHTML("div:grid-item", func(h *colly.HTMLElement) {
+    coll.OnHTML("div.grid-item", func(h *colly.HTMLElement) {
         selection := h.DOM
         day := strings.TrimSpace(selection.Find("div.event-date").Text())
         for _, date := range weekendDates {
