@@ -2,6 +2,7 @@
 
 import sys
 import json
+import os
 from pathlib import Path
 
 from typing import List, Dict
@@ -14,6 +15,10 @@ class HostEventHandler(object):
 
     def __init__(self, json_path: str):
         self.json_path = Path(json_path)
+        self.events = []
+        self._read_events()
+
+    def _read_events(self) -> None:
         if not self.json_path.exists():
             print("file not found")
             sys.exit()
@@ -28,6 +33,11 @@ class HostEventHandler(object):
             if eve.get('day') == day:
                 events.append(eve)
         return events
+
+    def update(self) -> None:
+        """scrapes all websites and rereads json"""
+        os.system("./evenpargo")
+        self._read_events()
 
 
 def format_events(events: T_EVENTS) -> str:
