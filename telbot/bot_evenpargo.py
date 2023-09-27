@@ -71,6 +71,7 @@ if __name__ == '__main__':
     application.add_handler(echo_handler)
 
     job = application.job_queue  # pip install "python-telegram-bot[job-queue]
-    job_minute = job.run_daily(update_events_job, datetime.time.fromisoformat('01:50:00+02:00'))
+    daily_update_eve = job.run_daily(update_events_job, datetime.time.fromisoformat('22:00:00+02:00'))
+    daily_update_mor = job.run_daily(update_events_job, datetime.time.fromisoformat('10:00:00+02:00'))
 
     application.run_polling()
