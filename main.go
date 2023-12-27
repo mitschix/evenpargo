@@ -10,6 +10,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly"
+	"github.com/goodsign/monday"
 )
 
 type event struct {
@@ -158,8 +159,12 @@ func get_fish() []EV_Day {
 
 				title := strings.TrimSpace(strings.Trim(full_text, tmp_date))
 				ev_time = strings.Trim(ev_time, "DORS \n")
-				ev_title := fmt.Sprintf("%s: %s", ev_time, title)
-				events = add_event_info(events, "Grelle Forelle", date.Weekday().String(), []string{ev_title})
+				event_info := event{
+					Title: title,
+					Time:  ev_time,
+					URL:   link,
+				}
+				events = add_event_info(events, "Grelle Forelle", date.Weekday().String(), event_info)
 			}
 		}
 	})
@@ -189,9 +194,21 @@ func get_flex() []EV_Day {
 							time := strings.TrimSpace(sel_art.Find("div.tribe-events-calendar-month__calendar-event-datetime").Text())
 							time = strings.ReplaceAll(time, "\t", "")
 							time = strings.ReplaceAll(time, "\n", "")
-							title := strings.TrimSpace(sel_art.Find("h3.tribe-events-calendar-month__calendar-event-title").Text())
-							events = add_event_info(events, "Flex", date.Weekday().String(),
-								[]string{fmt.Sprintf("%s: %s", time, title)})
+							sel_title := sel_art.Find("h3.tribe-events-calendar-month__calendar-event-title")
+
+							ev_link := sel_title.Find("a[href]")
+							link, exists := ev_link.Attr("href")
+							url := ""
+							if exists {
+								url = link
+							}
+							title := strings.TrimSpace(sel_title.Text())
+							event_info := event{
+								Title: title,
+								Time:  time,
+								URL:   url,
+							}
+							events = add_event_info(events, "Flex", date.Weekday().String(), event_info)
 						})
 
 				})
@@ -247,6 +264,12 @@ func get_werk() []EV_Day {
 		ev_day := ""
 		selection := h.DOM
 		title := strings.TrimSpace(selection.Find(".preview-item--headline").Text())
+		ev_link := selection.Find(".preview-item--link")
+		link, exists := ev_link.Attr("href")
+		url := ""
+		if exists {
+			url = link
+		}
 		day := selection.Find("ul.preview-item--information").Find("li:not([class])").First().Text()
 		time := selection.Find("ul.preview-item--information").Find("li:not([class])").Eq(1).Text()
 		time = strings.ReplaceAll(time, " Uhr", "")
@@ -260,24 +283,9 @@ func get_werk() []EV_Day {
 			default:
 			}
 			for _, date := range weekendDates {
-				tmp_date := date.Format("2. January")
+				tmp_date := monday.Format(date, "2. January", monday.LocaleDeDE)
 				if ev_day == date.Weekday().String() && strings.Contains(day, tmp_date) {
-					events = add_event_info(events, "dasWerk", date.Weekday().String(),
-						[]string{fmt.Sprintf("%s: %s", time, title)})
-				}
-			}
-
-		}
-
-	})
-
-	coll.OnError(func(r *colly.Response, err error) {
-		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
-	})
-
-	coll.Visit("https://www.daswerk.org/programm/")
-	return events
-}
+					fmt.Println(title, day, time, location)
 
 func get_hot() []EV_Day {
 	events := []EV_Day{}
