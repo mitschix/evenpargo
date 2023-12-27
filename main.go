@@ -285,7 +285,26 @@ func get_werk() []EV_Day {
 			for _, date := range weekendDates {
 				tmp_date := monday.Format(date, "2. January", monday.LocaleDeDE)
 				if ev_day == date.Weekday().String() && strings.Contains(day, tmp_date) {
-					fmt.Println(title, day, time, location)
+					event_info := event{
+						Title: title,
+						Time:  time,
+						URL:   url,
+					}
+					events = add_event_info(events, "dasWerk", date.Weekday().String(), event_info)
+				}
+			}
+
+		}
+
+	})
+
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+
+	coll.Visit("https://www.daswerk.org/programm/")
+	return events
+}
 
 func get_hot() []EV_Day {
 	events := []EV_Day{}
