@@ -559,13 +559,23 @@ func get_freytag(club string) []EV_Day {
 		if sub_title != "" {
 			sub_title = " " + sub_title
 		}
+
+		ev_link := selection.Find("a[href]")
+		link, exists := ev_link.Attr("href")
+		url := ""
+		if exists {
+			url = fmt.Sprintf("https://frey-tag.at/%s", link)
+		}
 		location := strings.TrimSpace(selection.Find("span.listKalender_EventLocation__2vPrT").Text())
 		for _, date := range weekendDates {
 			tmp_date := date.Format("02.01.2006")
 			if day == tmp_date {
-				full_title := fmt.Sprintf("%s: %s%s", time, title, sub_title)
-				events = add_event_info(events, location, date.Weekday().String(),
-					[]string{full_title})
+				event_info := event{
+					Title: fmt.Sprintf("%s%s", title, sub_title),
+					Time:  time,
+					URL:   url,
+				}
+				events = add_event_info(events, location, date.Weekday().String(), event_info)
 			}
 		}
 	})
