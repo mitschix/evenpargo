@@ -12,23 +12,29 @@ import (
 	"github.com/gocolly/colly"
 )
 
+type event struct {
+	Title string `json:"title"`
+	Time  string `json:"time"`
+	URL   string `json:"url"`
+}
+
 type events struct {
 	Events []EV_Day `json:"host_events"`
 }
 
 type EV_Day struct {
-	Host   string   `json:"host"`
-	Day    string   `json:"day"`
-	Events []string `json:"events"`
+	Host   string  `json:"host"`
+	Day    string  `json:"day"`
+	Events []event `json:"events"`
 }
 
 var weekendDates []time.Time
 
-func add_event_info(events []EV_Day, host string, day string, event_info []string) []EV_Day {
+func add_event_info(events []EV_Day, host string, day string, event_info event) []EV_Day {
 	found := false
 	for i, ev := range events {
 		if ev.Day == day {
-			events[i].Events = append(events[i].Events, event_info...)
+			events[i].Events = append(events[i].Events, event_info)
 			found = true
 			break
 		}
@@ -37,7 +43,7 @@ func add_event_info(events []EV_Day, host string, day string, event_info []strin
 		eve := EV_Day{
 			Host:   host,
 			Day:    day,
-			Events: event_info,
+			Events: []event{event_info},
 		}
 		events = append(events, eve)
 	}
@@ -59,7 +65,15 @@ func get_fluc() []EV_Day {
 
 		selection := h.DOM
 		day := strings.TrimSpace(selection.Find("span.tag").Text())
-		info := strings.TrimSpace(selection.Find("ul.info").Find("li.wanne").Text())
+		sel_wanne := selection.Find("ul.info").Find("li.wanne")
+		info := strings.TrimSpace(sel_wanne.Text())
+		ev_link := sel_wanne.Find("a[href]")
+		link, exists := ev_link.Attr("href")
+		url := ""
+		if exists {
+			url = link
+		}
+
 		switch day {
 		case "Freitag":
 			ev_day = "Friday"
@@ -71,7 +85,14 @@ func get_fluc() []EV_Day {
 		}
 
 		if is_weekend && info != "" {
-			events = add_event_info(events, "Fluc Wanne", ev_day, strings.Split(info, "\n"))
+			info_splitted := strings.SplitN(info, " ", 2)
+
+			event_info := event{
+				Title: info_splitted[1],
+				Time:  strings.TrimRight(info_splitted[0], ":"),
+				URL:   url,
+			}
+			events = add_event_info(events, "Fluc Wanne", ev_day, event_info)
 		}
 	})
 	coll.OnError(func(r *colly.Response, err error) {
