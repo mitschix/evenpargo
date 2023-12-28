@@ -1,11 +1,10 @@
 """Utility class to handle host events"""
 
-import sys
 import json
 import os
+import sys
 from pathlib import Path
-
-from typing import List, Dict
+from typing import Dict, List
 
 T_EVENTS = List[Dict[str, str]]
 
@@ -23,14 +22,14 @@ class HostEventHandler(object):
             print("file not found")
             sys.exit()
 
-        with self.json_path.open(encoding='utf8') as j_f:
+        with self.json_path.open(encoding="utf8") as j_f:
             content = json.load(j_f)
-        self.events = content.get('host_events')
+        self.events = content.get("host_events")
 
     def get_events_per_day(self, day: str) -> T_EVENTS:
         events = []
         for eve in self.events:
-            if eve.get('day') == day:
+            if eve.get("day") == day:
                 events.append(eve)
         return events
 
@@ -42,8 +41,12 @@ class HostEventHandler(object):
 
 def format_events(events: T_EVENTS) -> str:
     out = ""
-    for eve in events:
-        event_infos = '\n- '.join(eve.get('events'))
-        out += f"{eve.get('host')}\n- {event_infos}"
+    for club in events:
+        out += f"**{club.get('host')}**"
+        event_infos = club.get("events", [])
+        for info in event_infos:
+            val = list(info.values())
+            print(val)
+            out += f"\n- {val[1]}: {val[0]}\n({val[2]})\n"
         out += f"\n{10*'-----'}\n"
     return out
