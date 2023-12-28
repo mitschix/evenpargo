@@ -306,43 +306,6 @@ func get_werk() []EV_Day {
 	return events
 }
 
-func get_hot() []EV_Day {
-	events := []EV_Day{}
-
-	coll := colly.NewCollector()
-	coll.OnRequest(func(req *colly.Request) {
-		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
-	})
-
-	coll.OnHTML("div.header_txt", func(h *colly.HTMLElement) {
-		selection := h.DOM
-		text := strings.TrimSpace(selection.Find("div.marquee").Text())
-		ev_days := strings.Split(text, "/////")
-		for _, date := range weekendDates {
-			tmp_date := date.Format("02.01.2006")
-			for _, event := range ev_days {
-				ev_splitted := strings.Split(event, "//")
-				if len(ev_splitted) == 2 {
-					day, title := ev_splitted[0], strings.TrimSpace(ev_splitted[1])
-					if strings.Contains(day, tmp_date) {
-						if title != "TBA" {
-							events = add_event_info(events, "Pratersauna",
-								date.Weekday().String(), []string{title})
-						}
-					}
-				}
-			}
-		}
-	})
-
-	coll.OnError(func(r *colly.Response, err error) {
-		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
-	})
-
-	coll.Visit("https://pratersauna.tv/programm/")
-	return events
-}
-
 func get_loft() []EV_Day {
 	events := []EV_Day{}
 
@@ -660,7 +623,7 @@ func get_all_events() events {
 	}
 
 	// run freytag separate since it has args -> also as gorotines
-	frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen", "o-der-klub"}
+	frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen", "o-der-klub", "pratersauna"}
 	for _, club_name := range frey_clubs {
 		go func(club string) {
 			eventChan <- get_freytag(club)
