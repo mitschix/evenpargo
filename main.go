@@ -563,10 +563,19 @@ func get_b72() []EV_Day {
 					})
 					coll.Visit(h.Request.AbsoluteURL(link))
 				}
+				// TODO need to be tested -> currently no program
 				title_text := strings.TrimSpace(title.Text())
-				full_title := fmt.Sprintf("%s: %s", ev_time, title_text)
-				events = add_event_info(events, "B72", date.Weekday().String(),
-					[]string{full_title})
+				url := ""
+				if exists {
+					url = link
+				}
+
+				event_info := event{
+					Title: title_text,
+					Time:  ev_time,
+					URL:   url,
+				}
+				events = add_event_info(events, "B72", date.Weekday().String(), event_info)
 			}
 		}
 	})
