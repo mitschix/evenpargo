@@ -238,8 +238,12 @@ func get_exil() []EV_Day {
 		for _, date := range weekendDates {
 			tmp_date := date.Format("02/01/2006")
 			if strings.Contains(day, tmp_date) {
-				events = add_event_info(events, "Exil", date.Weekday().String(),
-					[]string{fmt.Sprintf("%s: %s", time, title)})
+				event_info := event{
+					Title: title,
+					Time:  time,
+					URL:   "",
+				}
+				events = add_event_info(events, "Exil", date.Weekday().String(), event_info)
 			}
 		}
 	})
@@ -606,7 +610,7 @@ func get_all_events() events {
 		get_fluc,
 		get_fish,
 		get_flex,
-		get_exil,
+		// get_exil, // FIXME: layout changed
 		get_werk,
 		get_loft,
 		get_black,
