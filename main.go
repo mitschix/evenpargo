@@ -412,9 +412,13 @@ func get_black() []EV_Day {
 				}
 				start, _ := strconv.Atoi(split_time[0])
 				end, _ := strconv.Atoi(split_time[1])
-				full_title := fmt.Sprintf("%02d:00-%02d:00: %s", start, end, title)
-				events = add_event_info(events, "Black Market", date.Weekday().String(),
-					[]string{full_title})
+				full_time := fmt.Sprintf("%02d:00-%02d:00", start, end)
+				event_info := event{
+					Title: title,
+					Time:  full_time,
+					URL:   "http://www.blackmarket.at/?page_id=49",
+				}
+				events = add_event_info(events, "Black Market", date.Weekday().String(), event_info)
 			}
 		}
 	})
