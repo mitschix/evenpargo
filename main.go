@@ -451,11 +451,21 @@ func get_rhiz() []EV_Day {
 					return
 				}
 				time := splitted[2]
-				title := strings.TrimSpace(selection.Find("h3").Text())
+				sel_title := selection.Find("h3")
+				title := strings.TrimSpace(sel_title.Text())
 
-				full_title := fmt.Sprintf("%s: %s", time, title)
-				events = add_event_info(events, "rhiz", date.Weekday().String(),
-					[]string{full_title})
+				ev_link := selection.Find("a[href]")
+				link, exists := ev_link.Attr("href")
+				url := ""
+				if exists {
+					url = link
+				}
+				event_info := event{
+					Title: title,
+					Time:  time,
+					URL:   url,
+				}
+				events = add_event_info(events, "rhiz", date.Weekday().String(), event_info)
 			}
 		}
 	})
