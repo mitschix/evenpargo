@@ -490,7 +490,7 @@ func get_sass() []EV_Day {
 		selection := h.DOM
 		day := strings.TrimSpace(selection.Find("span.start_date").Text())
 		for _, date := range weekendDates {
-			tmp_date := date.Format("02. Jan")
+			tmp_date := monday.Format(date, "2. Jan", monday.LocaleDeDE)
 			if strings.Contains(day, tmp_date) {
 
 				start := strings.TrimSpace(selection.Find("span.start_time").Text())
@@ -501,9 +501,22 @@ func get_sass() []EV_Day {
 					sub_title = " " + sub_title
 				}
 
-				full_title := fmt.Sprintf("%s-%s: %s%s", start, end, title, sub_title)
-				events = add_event_info(events, "SASS", date.Weekday().String(),
-					[]string{full_title})
+				full_title := fmt.Sprintf("%s%s", title, sub_title)
+				full_time := fmt.Sprintf("%s-%s", start, end)
+
+				ev_link := selection.Find("a[href]")
+				link, exists := ev_link.Attr("href")
+				url := ""
+				if exists {
+					url = fmt.Sprintf("https://sassvienna.com%s", link)
+				}
+
+				event_info := event{
+					Title: full_title,
+					Time:  full_time,
+					URL:   url,
+				}
+				events = add_event_info(events, "SASS", date.Weekday().String(), event_info)
 			}
 		}
 	})
