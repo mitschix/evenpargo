@@ -351,18 +351,28 @@ func get_loft() []EV_Day {
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
 	})
 
-	coll.OnHTML("div.box-wrap", func(h *colly.HTMLElement) {
+	coll.OnHTML("a[href]", func(h *colly.HTMLElement) {
 		selection := h.DOM
 		day := strings.TrimSpace(selection.Find("div.datum").Text())
 		time := strings.TrimSpace(selection.Find("span.open").Text())
 		title := strings.TrimSpace(selection.Find("div.content-middle").Text())
 		location := strings.TrimSpace(selection.Find("div.content-right").Text())
+
+		link, exists := selection.Attr("href")
+		url := ""
+		if exists {
+			url = link
+		}
+
 		for _, date := range weekendDates {
 			tmp_date := date.Format("02.1.2006")
 			if strings.Contains(day, tmp_date) {
-				full_title := fmt.Sprintf("%s: %s (%s)", time, title, location)
-				events = add_event_info(events, "theLoft", date.Weekday().String(),
-					[]string{full_title})
+				event_info := event{
+					Title: fmt.Sprintf("%s (%s)", title, location),
+					Time:  time,
+					URL:   url,
+				}
+				events = add_event_info(events, "theLoft", date.Weekday().String(), event_info)
 			}
 		}
 	})
