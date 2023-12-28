@@ -39,21 +39,30 @@ async def update_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_fri(update: Update, context: ContextTypes.DEFAULT_TYPE):
     event_msg = format_events(EVENTS.get_events_per_day("Friday"))
     await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=event_msg, parse_mode="Markdown"
+        chat_id=update.effective_chat.id,
+        text=event_msg,
+        parse_mode="Markdown",
+        disable_web_page_preview=True,
     )
 
 
 async def get_sat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     event_msg = format_events(EVENTS.get_events_per_day("Saturday"))
     await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=event_msg, parse_mode="Markdown"
+        chat_id=update.effective_chat.id,
+        text=event_msg,
+        parse_mode="Markdown",
+        disable_web_page_preview=True,
     )
 
 
 async def get_sun(update: Update, context: ContextTypes.DEFAULT_TYPE):
     event_msg = format_events(EVENTS.get_events_per_day("Sunday"))
     await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=event_msg, parse_mode="Markdown"
+        chat_id=update.effective_chat.id,
+        text=event_msg,
+        parse_mode="Markdown",
+        disable_web_page_preview=True,
     )
 
 
