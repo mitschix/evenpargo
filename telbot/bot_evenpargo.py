@@ -9,11 +9,12 @@ from telegram.ext import (
     CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
+    ConversationHandler,
     MessageHandler,
     filters,
 )
 
-from bot_keyboards import keyboard_days
+from bot_keyboards import keyboard_days, keyboard_report_types
 from config import MY_ID, TOKEN
 from parse_eve import HostEventHandler, format_events
 
@@ -22,6 +23,8 @@ EVENTS = HostEventHandler("./events.json")
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+
+REPORT_TYPE, REPORT_INFO = range(2)
 
 
 async def update_events_job(context: ContextTypes.DEFAULT_TYPE):
@@ -156,6 +159,43 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def submit_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    reply_markup = InlineKeyboardMarkup(keyboard_report_types)
+    await update.message.reply_text(
+        text="Please choose the type of report?",
+        reply_markup=reply_markup,
+    )
+
+    return REPORT_TYPE
+
+
+async def get_rep_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    rep_type = update.callback_query.data
+    context.user_data["type"] = rep_type
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Please tell me what's up?",
+    )
+
+    return REPORT_INFO
+
+
+async def send_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text("Thank you! I hope I can help you. (:")
+
+    await context.bot.send_message(
+        chat_id=MY_ID,
+        text=f"New Issue reported from: @{update.effective_user.username} . (:\n\nTopic: {context.user_data.get('type')}\n\nText:\n{update.message.text}",
+    )
+
+    return ConversationHandler.END
+
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text("Reporting cancelled.")
+    return ConversationHandler.END
+
+
 if __name__ == "__main__":
     application = ApplicationBuilder().token(TOKEN).build()
 
@@ -168,10 +208,22 @@ if __name__ == "__main__":
     event_show_h = CallbackQueryHandler(handle_events)
     echo_handler = MessageHandler(filters.TEXT, echo)
 
+    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
+
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("report", submit_report)],
+        states={
+            REPORT_TYPE: [CallbackQueryHandler(get_rep_type)],
+            REPORT_INFO: [MessageHandler(filters.TEXT, send_report)],
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+    )
+
     application.add_handler(start_handler)
     application.add_handler(update_h)
     application.add_handler(help_h)
     application.add_handler(list_h)
+    application.add_handler(conv_handler)
     application.add_handler(events_get_h)
     application.add_handler(event_show_h)
     application.add_handler(echo_handler)
@@ -184,4 +236,4 @@ if __name__ == "__main__":
         update_events_job, datetime.time.fromisoformat("10:00:00+02:00")
     )
 
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
