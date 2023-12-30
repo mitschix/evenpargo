@@ -127,16 +127,22 @@ async def handle_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_msg = """Welcome to *EvenParVIE*! (:
 
-This is a tiny little bot that tries to visit the website of a bunch of clubs in vienna to get the latest events of the current weekend. This can be useful to get a brief overview and see where you want to go out.
+This is a tiny little bot that tries to visit the websites of a bunch of _clubs in Vienna_ to get the latest events for the current weekend. This can be useful to get a quick overview and see where you want to go out.
 
 To get the events - run /events and choose the day you wish to get information about.
-To get more information or if you need any help you can run /help.
+To get the list of available clubs - run /list
+To get more information or if you need any help - run /help.
 
 Feedback is very much appreciated. (:
 
 Have a nice day/night and KEEP RAVING. 😁
 - @mitschix"""
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=welcome_msg)
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=welcome_msg,
+        parse_mode="Markdown",
+        disable_web_page_preview=True,
+    )
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
