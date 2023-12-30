@@ -137,6 +137,11 @@ Feedback is very much appreciated. (:
 
 Have a nice day/night and KEEP RAVING. 😁
 - @mitschix"""
+
+    await context.bot.send_message(
+        chat_id=MY_ID,
+        text=f"New user @{update.effective_user.username} . (:",
+    )
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=welcome_msg,
