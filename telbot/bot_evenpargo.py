@@ -31,6 +31,36 @@ async def update_events_job(context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def get_help_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    help_msg = """*How to use the bot?*
+The following list shows the currently available commands with a short description.
+
+- To get the events list run /events and choose the day you want to check.
+- To display this help message again, you can run /help.
+
+*What's more to come?*
+Here is a list of features I have in mind that will be implemented sooner or later.
+
+- Add a custom event to distribute it to others.
+- Prefilter the clubs you wish to get updates about.
+- Get updates about the next week.
+- Open Issues/Request new clubs/Give Feedback via the bot.
+
+*Feedback/Issues/Requests?*
+If you got any of the above you can use one of the following methods:
+
+- Use the bot builtin functionality. (TBD)
+- Open up an Issue on [GitHub](https://github.com/mitschix/evenpargo/issues). (if you know what that is and how to use it :D)
+- Contact me directly and tell me what's on your mind - @mitschix (:
+"""
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=help_msg,
+        parse_mode="Markdown",
+        disable_web_page_preview=True,
+    )
+
+
 async def update_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
     EVENTS.update()
     await context.bot.send_message(
@@ -62,9 +92,18 @@ async def handle_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!"
-    )
+    welcome_msg = """Welcome to *EvenParVIE*! (:
+
+This is a tiny little bot that tries to visit the website of a bunch of clubs in vienna to get the latest events of the current weekend. This can be useful to get a brief overview and see where you want to go out.
+
+To get the events - run /events and choose the day you wish to get information about.
+To get more information or if you need any help you can run /help.
+
+Feedback is very much appreciated. (:
+
+Have a nice day/night and KEEP RAVING. 😁
+- @mitschix"""
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=welcome_msg)
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -78,12 +117,15 @@ if __name__ == "__main__":
 
     start_handler = CommandHandler("start", start)
     update_h = CommandHandler("update", update_events)
+    help_h = CommandHandler("help", get_help_msg)
+
     events_get_h = CommandHandler("events", get_events)
     event_show_h = CallbackQueryHandler(handle_events)
     echo_handler = MessageHandler(filters.TEXT, echo)
 
     application.add_handler(start_handler)
     application.add_handler(update_h)
+    application.add_handler(help_h)
     application.add_handler(events_get_h)
     application.add_handler(event_show_h)
     application.add_handler(echo_handler)
