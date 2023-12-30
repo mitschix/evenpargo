@@ -160,7 +160,7 @@ if __name__ == "__main__":
     application = ApplicationBuilder().token(TOKEN).build()
 
     start_handler = CommandHandler("start", start)
-    update_h = CommandHandler("update", update_events)
+    update_h = CommandHandler("update", update_events, filters.User(MY_ID))
     help_h = CommandHandler("help", get_help_msg)
     list_h = CommandHandler("list", get_club_list)
 
