@@ -36,6 +36,7 @@ async def get_help_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
 The following list shows the currently available commands with a short description.
 
 - To get the events list run /events and choose the day you want to check.
+- To get a list of currently checked clubs, use the command /list.
 - To display this help message again, you can run /help.
 
 *What's more to come?*
@@ -53,6 +54,38 @@ If you got any of the above you can use one of the following methods:
 - Open up an Issue on [GitHub](https://github.com/mitschix/evenpargo/issues). (if you know what that is and how to use it :D)
 - Contact me directly and tell me what's on your mind - @mitschix (:
 """
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=help_msg,
+        parse_mode="Markdown",
+        disable_web_page_preview=True,
+    )
+
+
+async def get_club_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    help_msg = """The following clubs are currently checked for upcoming events:
+
+Via their own website:
+- [B72](https://www.b72.at/program)
+- [BlackMarket](http://www.blackmarket.at/?page_id=49)
+- [Exil](https://exil1.ticket.io/)
+- [Flex](https://flex.at/events/monat/)
+- [Fluc Wanne](https://fluc.at/programm/2023_Flucwoche%d.html)
+- [Grelle Forelle](https://www.grelleforelle.com/programm/)
+- [Rhiz](https://rhiz.wien/programm/)
+- [SASS](https://sassvienna.com/programm)
+- [dasWerk](https://www.daswerk.org/programm/)
+- [theLoft](https://www.theloft.at/programm/)
+
+Via frey-tag.at:
+- [Kramladen](https://frey-tag.at/locations/kramladen)
+- [O-Klub](https://frey-tag.at/locations/o-der-klub)
+- [Pratersauna](https://frey-tag.at/locations/pratersauna)
+- [Praterstrasse/PRST](https://frey-tag.at/locations/club-praterstrasse)
+- [club-u](https://frey-tag.at/locations/club-u)
+- [ponyhof](https://frey-tag.at/locations/ponyhof)
+
+If you are missing some clubs check /help to see how to request new ones and I will do my best to add them in future releases if possible."""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=help_msg,
@@ -118,6 +151,7 @@ if __name__ == "__main__":
     start_handler = CommandHandler("start", start)
     update_h = CommandHandler("update", update_events)
     help_h = CommandHandler("help", get_help_msg)
+    list_h = CommandHandler("list", get_club_list)
 
     events_get_h = CommandHandler("events", get_events)
     event_show_h = CallbackQueryHandler(handle_events)
@@ -126,6 +160,7 @@ if __name__ == "__main__":
     application.add_handler(start_handler)
     application.add_handler(update_h)
     application.add_handler(help_h)
+    application.add_handler(list_h)
     application.add_handler(events_get_h)
     application.add_handler(event_show_h)
     application.add_handler(echo_handler)
