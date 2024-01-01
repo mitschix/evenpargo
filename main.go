@@ -287,7 +287,8 @@ func get_werk() []EV_Day {
 			default:
 			}
 			for _, date := range weekendDates {
-				tmp_date := monday.Format(date, "2. January", monday.LocaleDeDE)
+				tmp_date := monday.Format(date, "02. January", monday.LocaleDeDE)
+				tmp_date = strings.Replace(tmp_date, "Januar", "Jänner", 1)
 				if ev_day == date.Weekday().String() && strings.Contains(day, tmp_date) {
 					event_info := event{
 						Title: title,
