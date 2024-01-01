@@ -99,7 +99,7 @@ func get_fluc() []EV_Day {
 	coll.OnError(func(r *colly.Response, err error) {
 		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
 	})
-	coll.Visit(fmt.Sprintf("https://fluc.at/programm/2023_Flucwoche%d.html", week))
+	coll.Visit(fmt.Sprintf("https://fluc.at/programm/2024_Flucwoche%02d.html", week))
 	return events
 }
 
