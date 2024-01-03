@@ -3,7 +3,7 @@ WELCOME_MSG = """Welcome to *EvenParVIE*! (:
 This is a tiny little bot that tries to visit the websites of a bunch of _clubs in Vienna_ to get the latest events for the current weekend. This can be useful to get a quick overview and see where you want to go.
 
 To get the events - run /events and choose the day you wish to get information about.
-To get the list of available clubs - run /list
+To get the list of available clubs - run /list.
 To get more information or if you need any help - run /help.
 
 Feedback is very much appreciated. (:
@@ -17,6 +17,7 @@ The following list shows the currently available commands with a short descripti
 - To get the events list run /events and choose the day you want to check.
 - To get a list of currently available clubs, use the command /list.
 - To display this help message again, you can run /help.
+- To report any feedback/issue/request, use /report.
 
 *What's more to come?*
 Here is a list of features I have in mind that will be implemented sooner or later.
