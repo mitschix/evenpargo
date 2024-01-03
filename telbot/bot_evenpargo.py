@@ -14,6 +14,8 @@ from telegram.ext import (
 )
 
 from bot_keyboards import keyboard_days
+from bot_msg import CLUB_MSG, HELP_MSG, WELCOME_MSG
+from bot_report_conv_handler import conv_handler
 from config import MY_ID, TOKEN
 from parse_eve import HostEventHandler, format_events
 
@@ -32,63 +34,18 @@ async def update_events_job(context: ContextTypes.DEFAULT_TYPE):
 
 
 async def get_help_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    help_msg = """*How to use the bot?*
-The following list shows the currently available commands with a short description.
-
-- To get the events list run /events and choose the day you want to check.
-- To get a list of currently checked clubs, use the command /list.
-- To display this help message again, you can run /help.
-
-*What's more to come?*
-Here is a list of features I have in mind that will be implemented sooner or later.
-
-- Add a custom event to distribute it to others.
-- Prefilter the clubs you wish to get updates about.
-- Get updates about the next week.
-- Open Issues/Request new clubs/Give Feedback via the bot.
-
-*Feedback/Issues/Requests?*
-If you got any of the above you can use one of the following methods:
-
-- Use the bot builtin functionality. (TBD)
-- Open up an Issue on [GitHub](https://github.com/mitschix/evenpargo/issues). (if you know what that is and how to use it :D)
-- Contact me directly and tell me what's on your mind - @mitschix (:
-"""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=help_msg,
+        text=HELP_MSG,
         parse_mode="Markdown",
         disable_web_page_preview=True,
     )
 
 
 async def get_club_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    help_msg = """The following clubs are currently checked for upcoming events:
-
-Via their own website:
-- [B72](https://www.b72.at/program)
-- [BlackMarket](http://www.blackmarket.at/?page_id=49)
-- [Exil](https://exil1.ticket.io/)
-- [Flex](https://flex.at/events/monat/)
-- [Fluc Wanne](https://fluc.at/programm/2023_Flucwoche%d.html)
-- [Grelle Forelle](https://www.grelleforelle.com/programm/)
-- [Rhiz](https://rhiz.wien/programm/)
-- [SASS](https://sassvienna.com/programm)
-- [dasWerk](https://www.daswerk.org/programm/)
-- [theLoft](https://www.theloft.at/programm/)
-
-Via frey-tag.at:
-- [Kramladen](https://frey-tag.at/locations/kramladen)
-- [O-Klub](https://frey-tag.at/locations/o-der-klub)
-- [Pratersauna](https://frey-tag.at/locations/pratersauna)
-- [Praterstrasse/PRST](https://frey-tag.at/locations/club-praterstrasse)
-- [club-u](https://frey-tag.at/locations/club-u)
-- [ponyhof](https://frey-tag.at/locations/ponyhof)
-
-If you are missing some clubs check /help to see how to request new ones and I will do my best to add them in future releases if possible."""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=help_msg,
+        text=CLUB_MSG,
         parse_mode="Markdown",
         disable_web_page_preview=True,
     )
@@ -125,26 +82,13 @@ async def handle_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    welcome_msg = """Welcome to *EvenParVIE*! (:
-
-This is a tiny little bot that tries to visit the websites of a bunch of _clubs in Vienna_ to get the latest events for the current weekend. This can be useful to get a quick overview and see where you want to go out.
-
-To get the events - run /events and choose the day you wish to get information about.
-To get the list of available clubs - run /list
-To get more information or if you need any help - run /help.
-
-Feedback is very much appreciated. (:
-
-Have a nice day/night and KEEP RAVING. 😁
-- @mitschix"""
-
     await context.bot.send_message(
         chat_id=MY_ID,
         text=f"New user @{update.effective_user.username} . (:",
     )
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=welcome_msg,
+        text=WELCOME_MSG,
         parse_mode="Markdown",
         disable_web_page_preview=True,
     )
@@ -168,10 +112,13 @@ if __name__ == "__main__":
     event_show_h = CallbackQueryHandler(handle_events)
     echo_handler = MessageHandler(filters.TEXT, echo)
 
+    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
+
     application.add_handler(start_handler)
     application.add_handler(update_h)
     application.add_handler(help_h)
     application.add_handler(list_h)
+    application.add_handler(conv_handler)
     application.add_handler(events_get_h)
     application.add_handler(event_show_h)
     application.add_handler(echo_handler)
@@ -184,4 +131,4 @@ if __name__ == "__main__":
         update_events_job, datetime.time.fromisoformat("10:00:00+02:00")
     )
 
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
