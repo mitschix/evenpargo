@@ -1,15 +1,25 @@
 # \[Even\]t \[par\]set in \[go\]
 
 Little script to learn go and scrape data from club websites in vienna to show the upcoming events.
-Target is to output a json file to feed to a bot/web page to display them nicely.
+Outputs a JSON file, which is then used by an [telegram bot](telbot), to display the information.
 
-Currently parsed websites:
+The let the bot trigger the update of the JSON automatically, the binary needs to be put inside its
+directory. Then the bot will run twice a day. In addition, the update can be triggered with
+`/update` (only by the hoster).
+
+To built the binary inside the directory, run the following command:
+
+```
+go build -o telbot
+```
+
+### Currently parsed websites:
 
 - [B72](https://www.b72.at/program)
 - [BlackMarket](http://www.blackmarket.at/?page_id=49)
 - [Exil](https://exil1.ticket.io/)
 - [Flex](https://flex.at/events/monat/)
-- [Fluc Wanne](https://fluc.at/programm/2023_Flucwoche%25d.html)
+- [Fluc Wanne](https://fluc.at/programm/2024_Flucwoche01.html)
 - [Grelle Forelle](https://www.grelleforelle.com/programm/)
 - [Rhiz](https://rhiz.wien/programm/)
 - [SASS](https://sassvienna.com/programm)

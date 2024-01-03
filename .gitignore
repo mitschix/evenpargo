@@ -1,3 +1,4 @@
 evenpargo
 *.pyc
 events.json
+telbot/config.py
