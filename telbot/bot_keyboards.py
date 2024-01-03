@@ -10,3 +10,7 @@ keyboard_report_types = [
     [InlineKeyboardButton("Request", callback_data="Request")],
     [InlineKeyboardButton("Issue", callback_data="Issue")],
 ]
+keyboard_report_user = [
+    [InlineKeyboardButton("Sure/OK! ✅", callback_data=1)],
+    [InlineKeyboardButton("I would prefer not to. ❌", callback_data=0)],
+]

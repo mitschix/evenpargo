@@ -24,12 +24,11 @@ Here is a list of features I have in mind that will be implemented sooner or lat
 - Add a custom event to distribute it to others.
 - Prefilter the clubs you wish to get updates about.
 - Get updates about the next week.
-- Open Issues/Request new clubs/Give Feedback via the bot.
 
 *Feedback/Issues/Requests?*
 If you got any of the above you can use one of the following methods:
 
-- Use the bot builtin functionality. (TBD)
+- Use the bot builtin functionality. (/report)
 - Open up an Issue on [GitHub](https://github.com/mitschix/evenpargo/issues). (if you know what that is and how to use it :D)
 - Contact me directly and tell me what's on your mind - @mitschix (:
 """
@@ -40,7 +39,7 @@ Via their own website:
 - [BlackMarket](http://www.blackmarket.at/?page_id=49)
 - [Exil](https://exil1.ticket.io/)
 - [Flex](https://flex.at/events/monat/)
-- [Fluc Wanne](https://fluc.at/programm/2023_Flucwoche%d.html)
+- [Fluc Wanne](https://fluc.at/programm/2024_Flucwoche01.html)
 - [Grelle Forelle](https://www.grelleforelle.com/programm/)
 - [Rhiz](https://rhiz.wien/programm/)
 - [SASS](https://sassvienna.com/programm)

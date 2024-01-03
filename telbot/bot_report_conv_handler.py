@@ -8,10 +8,10 @@ from telegram.ext import (
     filters,
 )
 
-from bot_keyboards import keyboard_report_types
+from bot_keyboards import keyboard_report_types, keyboard_report_user
 from config import MY_ID
 
-REPORT_TYPE, REPORT_INFO = range(2)
+REPORT_TYPE, REPORT_USER, REPORT_INFO = range(3)
 
 
 async def submit_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -27,20 +27,52 @@ async def submit_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 async def get_rep_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     rep_type = update.callback_query.data
     context.user_data["type"] = rep_type
-    await context.bot.send_message(
+    await context.bot.edit_message_text(
         chat_id=update.effective_chat.id,
-        text="Please tell me what's up?",
+        message_id=update.callback_query.message.message_id,
+        text=f"Please tell me what's on your mind? ({rep_type}) 🤔",
     )
 
+    return REPORT_USER
+
+
+async def get_rep_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    rep_type = context.user_data.get("type")
+    context.user_data["text"] = update.message.text
+    reply_markup = InlineKeyboardMarkup(keyboard_report_user)
+    await context.bot.send_message(
+        text=f"Thank you for your message! I hope I can help you with this {rep_type}. (:\n\n"
+        + f"If you don't mind, I'll send your username along with the {rep_type} - in case I have further questions - OK?",
+        chat_id=update.effective_chat.id,
+        reply_markup=reply_markup,
+    )
     return REPORT_INFO
 
 
 async def send_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text("Thank you! I hope I can help you. (:")
+    rep_type = context.user_data.get("type")
+    rep_text = context.user_data.get("text")
+    user_check = bool(int(update.callback_query.data))
+    rep_msg = f"""New Report! (:
+
+Topic: {rep_type}
+
+Text:
+{rep_text}
+
+{f'User: @{update.effective_user.username}' if user_check else ''}
+#{rep_type.lower()}"""
 
     await context.bot.send_message(
         chat_id=MY_ID,
-        text=f"New Issue reported from: @{update.effective_user.username} . (:\n\nTopic: {context.user_data.get('type')}\n\nText:\n{update.message.text}",
+        text=rep_msg,
+    )
+
+    await context.bot.edit_message_text(
+        chat_id=update.effective_chat.id,
+        message_id=update.callback_query.message.message_id,
+        text=f"Thank you! (:\n\n*{rep_type}* sent with the following text:\n_{rep_text}_",
+        parse_mode="Markdown",
     )
 
     return ConversationHandler.END
@@ -55,7 +87,8 @@ conv_handler = ConversationHandler(
     entry_points=[CommandHandler("report", submit_report)],
     states={
         REPORT_TYPE: [CallbackQueryHandler(get_rep_type)],
-        REPORT_INFO: [MessageHandler(filters.TEXT, send_report)],
+        REPORT_USER: [MessageHandler(filters.TEXT, get_rep_user)],
+        REPORT_INFO: [CallbackQueryHandler(send_report)],
     },
     fallbacks=[CommandHandler("cancel", cancel)],
 )
