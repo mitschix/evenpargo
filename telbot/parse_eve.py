@@ -41,11 +41,13 @@ class HostEventHandler(object):
 
 def format_events(events: T_EVENTS) -> str:
     out = ""
+    escape_open = "\\["
+    escape_close = "\\["
     for club in events:
         out += f"*{club.get('host')}*"
         event_infos = club.get("events", [])
         for info in event_infos:
             val = list(info.values())
-            out += f"\n- {val[1]}: [{val[0]}]({val[2]})"
+            out += f"\n- {val[1]}: [{val[0].replace('[',escape_open).replace(']',escape_close)}]({val[2]})"
         out += f"\n{10*'-----'}\n"
     return out
