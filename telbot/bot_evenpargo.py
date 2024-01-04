@@ -84,7 +84,7 @@ async def handle_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=MY_ID,
-        text=f"New user @{update.effective_user.username} . (:",
+        text=f"New user {update.effective_user.first_name} {update.effective_user.last_name} - @{update.effective_user.username} . (:",
     )
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
