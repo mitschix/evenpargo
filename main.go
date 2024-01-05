@@ -516,7 +516,10 @@ func get_b72() []EV_Day {
 
 				ev_link := title.Find("a[href]")
 				link, exists := ev_link.Attr("href")
+				url := ""
 				if exists {
+					url = fmt.Sprintf("https://www.b72.at%s", link)
+
 					coll.OnHTML("div.show-detail", func(h *colly.HTMLElement) {
 						link_sel := h.DOM
 						link_sel.Find("b:not([class])").Each(func(_ int, s *goquery.Selection) {
@@ -531,12 +534,7 @@ func get_b72() []EV_Day {
 					})
 					coll.Visit(h.Request.AbsoluteURL(link))
 				}
-				// TODO need to be tested -> currently no program
 				title_text := strings.TrimSpace(title.Text())
-				url := ""
-				if exists {
-					url = link
-				}
 
 				event_info := event{
 					Title: title_text,
