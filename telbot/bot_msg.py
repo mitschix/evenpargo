@@ -6,18 +6,24 @@ To get the events - run /events and choose the day you wish to get information a
 To get the list of available clubs - run /list.
 To get more information or if you need any help - run /help.
 
+Furthermore, the bot has a little reminder, which will send you one message with all days at a given time. It can be controlled with /reminder and is activated and set to _Thursday, 18:00_\\* at startup.
+
 Feedback is very much appreciated. (:
 
 Have a nice day/night and KEEP RAVING. 😁
-- @mitschix"""
+- @mitschix
+
+\\* or 19:00 if daylight saving time is messing around. 😬"""
 
 HELP_MSG = """*How to use the bot?*
 The following list shows the currently available commands with a short description.
 
 - To get the events list run /events and choose the day you want to check.
+- To toggle the reminder or change its time, use /reminder.
 - To get a list of currently available clubs, use the command /list.
 - To display this help message again, you can run /help.
 - To report any feedback/issue/request, use /report.
+- To cancel any reminder/report interaction, use /cancel at any time.
 
 *What's more to come?*
 Here is a list of features I have in mind that will be implemented sooner or later.
@@ -25,6 +31,7 @@ Here is a list of features I have in mind that will be implemented sooner or lat
 - Add a custom event to distribute it to others.
 - Prefilter the clubs you wish to get updates about.
 - Get updates about the next week.
+- Persistent reminder settings
 
 *Feedback/Issues/Requests?*
 If you got any of the above you can use one of the following methods:
