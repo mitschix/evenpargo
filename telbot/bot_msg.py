@@ -38,7 +38,7 @@ If you got any of the above you can use one of the following methods:
 
 - Use the bot builtin functionality. (/report)
 - Open up an Issue on [GitHub](https://github.com/mitschix/evenpargo/issues). (if you know what that is and how to use it :D)
-- Access the [customer support channel](https://t.me/+bzJJYZaQ7ddlYzI0) and chat.
+- Access the [Customer Support channel](https://t.me/+bzJJYZaQ7ddlYzI0) and get updates or chat.
 - Contact me directly and tell me what's on your mind. (:
 """
 CLUB_MSG = """The following clubs are currently checked for upcoming events:
