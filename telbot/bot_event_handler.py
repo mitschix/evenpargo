@@ -1,6 +1,9 @@
 import datetime
 
 import pytz
+from bot_keyboards import keyboard_days
+from config import SUPPORT_ID
+from parse_eve import HostEventHandler, format_events
 from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -9,10 +12,6 @@ from telegram.ext import (
     JobQueue,
     filters,
 )
-
-from bot_keyboards import keyboard_days
-from config import SUPPORT_ID
-from parse_eve import HostEventHandler, format_events
 
 EVENTS = HostEventHandler("./events.json")
 
@@ -43,7 +42,7 @@ async def get_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q_data = update.callback_query.data
     q_day = q_data.split("_")[1].title()
-    event_msg = format_events(EVENTS.get_events_per_day(q_day))
+    event_msg = f"*=== {q_day} ===*\n" + format_events(EVENTS.get_events_per_day(q_day))
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=event_msg,

@@ -2,6 +2,7 @@ import datetime
 from typing import List, Tuple
 
 import pytz
+from bot_event_handler import EVENTS, format_events
 from bot_keyboards import (
     keyboard_reminder_choice,
     keyboard_reminder_conf,
@@ -32,7 +33,20 @@ DAY_MAPPING = [
 
 
 async def reminder_events(context: ContextTypes.DEFAULT_TYPE) -> None:
-    event_msg = "fri - sa - so"
+    fri_events = format_events(EVENTS.get_events_per_day("Friday"))
+    sat_events = format_events(EVENTS.get_events_per_day("Saturday"))
+    sun_events = format_events(EVENTS.get_events_per_day("Sunday"))
+    event_msg = f"""*=== Friday ===*
+
+{fri_events}
+
+*=== Saturday ===*
+
+{sat_events}
+
+*=== Sunday ===*
+
+{sun_events}"""
     await context.bot.send_message(
         chat_id=context.job.chat_id,
         text=event_msg,
