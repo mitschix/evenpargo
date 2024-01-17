@@ -1,80 +1,31 @@
 #!/usr/bin/env python
 """Telegram bot to read events.json and returns events"""
-import datetime
 import logging
 
-import pytz
-from bot_keyboards import keyboard_days
-from bot_msg import CLUB_MSG, HELP_MSG, WELCOME_MSG
-from bot_reminder_handler import rem_handler, set_default
-from bot_report_conv_handler import conv_handler
-from config import SUPPORT_ID, TOKEN
-from parse_eve import HostEventHandler, format_events
-from telegram import InlineKeyboardMarkup, Update
+from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
-    CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
     MessageHandler,
     filters,
 )
 
-EVENTS = HostEventHandler("./events.json")
+from bot_event_handler import event_get_h, event_show_h, event_update_h, set_update_jobs
+from bot_msg import CLUB_MSG, HELP_MSG, WELCOME_MSG
+from bot_reminder_handler import rem_handler, set_default
+from bot_report_conv_handler import conv_handler
+from config import SUPPORT_ID, TOKEN
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 
-async def update_events_job(context: ContextTypes.DEFAULT_TYPE):
-    EVENTS.update()
-    await context.bot.send_message(
-        chat_id=SUPPORT_ID, text="(Job) Events should be up-to-date. (: "
-    )
-
-
-async def get_help_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=HELP_MSG,
-        parse_mode="Markdown",
-        disable_web_page_preview=True,
-    )
-
-
 async def get_club_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=CLUB_MSG,
-        parse_mode="Markdown",
-        disable_web_page_preview=True,
-    )
-
-
-async def update_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    EVENTS.update()
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text="Events should be up-to-date. (: "
-    )
-
-
-async def get_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    reply_markup = InlineKeyboardMarkup(keyboard_days)
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Which day you want to choose?",
-        reply_markup=reply_markup,
-    )
-
-
-async def handle_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    q_data = update.callback_query.data
-    q_day = q_data.split("_")[1].title()
-    event_msg = format_events(EVENTS.get_events_per_day(q_day))
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=event_msg,
         parse_mode="Markdown",
         disable_web_page_preview=True,
     )
@@ -94,6 +45,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def get_help_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=HELP_MSG,
+        parse_mode="Markdown",
+        disable_web_page_preview=True,
+    )
+
+
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id, text="Sorry unrecogniced message :/"
@@ -104,30 +64,26 @@ if __name__ == "__main__":
     application = ApplicationBuilder().token(TOKEN).build()
 
     start_handler = CommandHandler("start", start)
-    update_h = CommandHandler("update", update_events, filters.User(SUPPORT_ID))
     help_h = CommandHandler("help", get_help_msg)
     list_h = CommandHandler("list", get_club_list)
 
-    events_get_h = CommandHandler("events", get_events)
-    event_show_h = CallbackQueryHandler(handle_events)
     echo_handler = MessageHandler(filters.TEXT, echo)
 
-    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
-
     application.add_handler(start_handler)
-    application.add_handler(update_h)
     application.add_handler(help_h)
     application.add_handler(list_h)
+
     application.add_handler(conv_handler)
+
     application.add_handler(rem_handler)
-    application.add_handler(events_get_h)
+
+    application.add_handler(event_update_h)
+    application.add_handler(event_get_h)
     application.add_handler(event_show_h)
+
     application.add_handler(echo_handler)
 
-    job = application.job_queue  # pip install "python-telegram-bot[job-queue]
-    daily_upadte_time = datetime.time(hour=22, tzinfo=pytz.timezone("Europe/Berlin"))
-    daily_update_eve = job.run_daily(update_events_job, daily_upadte_time)
-    daily_upadte_time = datetime.time(hour=10, tzinfo=pytz.timezone("Europe/Berlin"))
-    daily_update_eve = job.run_daily(update_events_job, daily_upadte_time)
+    jobq = application.job_queue  # pip install "python-telegram-bot[job-queue]
+    set_update_jobs(jobq)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
