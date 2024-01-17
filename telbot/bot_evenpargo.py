@@ -15,6 +15,7 @@ from telegram.ext import (
 
 from bot_keyboards import keyboard_days
 from bot_msg import CLUB_MSG, HELP_MSG, WELCOME_MSG
+from bot_reminder_handler import rem_handler, set_default
 from bot_report_conv_handler import conv_handler
 from config import MY_ID, TOKEN
 from parse_eve import HostEventHandler, format_events
@@ -69,9 +70,7 @@ async def get_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q_data = update.callback_query.data
-    print(q_data)
     q_day = q_data.split("_")[1].title()
-    print(q_day)
     event_msg = format_events(EVENTS.get_events_per_day(q_day))
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -86,6 +85,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=MY_ID,
         text=f"New user {update.effective_user.first_name} {update.effective_user.last_name} - @{update.effective_user.username} . (:",
     )
+    set_default(update.effective_chat.id, context)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=WELCOME_MSG,
@@ -119,6 +119,7 @@ if __name__ == "__main__":
     application.add_handler(help_h)
     application.add_handler(list_h)
     application.add_handler(conv_handler)
+    application.add_handler(rem_handler)
     application.add_handler(events_get_h)
     application.add_handler(event_show_h)
     application.add_handler(echo_handler)
