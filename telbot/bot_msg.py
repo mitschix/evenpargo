@@ -11,7 +11,6 @@ Furthermore, the bot has a little reminder, which will send you one message with
 Feedback is very much appreciated. (:
 
 Have a nice day/night and KEEP RAVING. 😁
-- @mitschix
 
 \\* or 19:00 if daylight saving time is messing around. 😬"""
 
@@ -31,14 +30,16 @@ Here is a list of features I have in mind that will be implemented sooner or lat
 - Add a custom event to distribute it to others.
 - Prefilter the clubs you wish to get updates about.
 - Get updates about the next week.
-- Persistent reminder settings
+- Persistent reminder settings.
+- Private channel to talk to others or exchange further event information.
 
 *Feedback/Issues/Requests?*
 If you got any of the above you can use one of the following methods:
 
 - Use the bot builtin functionality. (/report)
 - Open up an Issue on [GitHub](https://github.com/mitschix/evenpargo/issues). (if you know what that is and how to use it :D)
-- Contact me directly and tell me what's on your mind - @mitschix (:
+- Access the [customer support channel](https://t.me/+bzJJYZaQ7ddlYzI0) and chat.
+- Contact me directly and tell me what's on your mind. (:
 """
 CLUB_MSG = """The following clubs are currently checked for upcoming events:
 
