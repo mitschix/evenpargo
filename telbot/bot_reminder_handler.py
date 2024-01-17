@@ -2,18 +2,17 @@ import datetime
 from typing import List, Tuple
 
 import pytz
+from bot_keyboards import (
+    keyboard_reminder_choice,
+    keyboard_reminder_conf,
+    keyboard_reminder_days,
+)
 from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import (
     CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
     ConversationHandler,
-)
-
-from bot_keyboards import (
-    keyboard_reminder_choice,
-    keyboard_reminder_conf,
-    keyboard_reminder_days,
 )
 from telegramtimepicker import TimePicker
 
@@ -100,7 +99,7 @@ async def handle_time_picker(update: Update, context: ContextTypes.DEFAULT_TYPE)
             await context.bot.edit_message_text(
                 chat_id=update.effective_chat.id,
                 message_id=update.callback_query.message.message_id,
-                text=f"🟢 New reminder set to: _{DAY_MAPPING[rem_day]}, {hour}:{minute}_!",
+                text=f"🟢 New reminder set to: _{DAY_MAPPING[rem_day]}, {hour:02d}:{minute:02d}_!",
                 parse_mode="Markdown",
             )
             return ConversationHandler.END
@@ -127,7 +126,7 @@ async def handle_day(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await context.bot.edit_message_text(
         chat_id=chat_id,
         message_id=update.callback_query.message.message_id,
-        text="⏲️ Please select the time you wish to be reminded:",
+        text="🕔 Please select the time you wish to be reminded at:",
         reply_markup=timepicker.create_timepicker(),
     )
     return REMINDER_TIME

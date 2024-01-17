@@ -12,7 +12,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 class TimePicker:
     def __init__(
         self,
-        start_hour: int = 12,
+        start_hour: int = 18,
         start_minute: int = 0,
         max_hour: int = 23,
         min_hour: int = 0,
@@ -33,7 +33,7 @@ class TimePicker:
     def create_timepicker(self, hour: int = None, minute: int = None):
         keyboard_time = []
 
-        hour = hour if hour else self.start_hour
+        hour = hour if hour or isinstance(hour, int) else self.start_hour
         minute = minute if minute else self.start_minute
 
         if hour + self.steps_hour <= self.max_hour:
@@ -42,7 +42,7 @@ class TimePicker:
             )
         else:
             key_h_up = InlineKeyboardButton(
-                "", callback_data=self._create_callback_data("IGNORE", hour, minute)
+                "-", callback_data=self._create_callback_data("IGNORE", hour, minute)
             )
 
         if hour - self.steps_hour >= self.min_hour:
@@ -50,8 +50,8 @@ class TimePicker:
                 "↓", callback_data=self._create_callback_data("DOWN-Hour", hour, minute)
             )
         else:
-            key_h_up = InlineKeyboardButton(
-                " ", callback_data=self._create_callback_data("IGNORE", hour, minute)
+            key_h_down = InlineKeyboardButton(
+                "-", callback_data=self._create_callback_data("IGNORE", hour, minute)
             )
 
         key_m_up = InlineKeyboardButton(
@@ -88,6 +88,7 @@ class TimePicker:
     ) -> Tuple[bool, datetime.time]:
         query = update.callback_query
         action, hour, minute = query.data.split(";")
+        print(query.data)
 
         # fix since +/- does not work with datetime.time
         now = datetime.datetime.now()
