@@ -9,7 +9,7 @@ from telegram.ext import (
 )
 
 from bot_keyboards import keyboard_report_types, keyboard_report_user
-from config import MY_ID
+from config import SUPPORT_ID
 
 REPORT_TYPE, REPORT_USER, REPORT_INFO = range(3)
 
@@ -64,7 +64,7 @@ Text:
 #{rep_type.lower()}"""
 
     await context.bot.send_message(
-        chat_id=MY_ID,
+        chat_id=SUPPORT_ID,
         text=rep_msg,
     )
 

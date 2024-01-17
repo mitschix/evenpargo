@@ -4,6 +4,12 @@ import datetime
 import logging
 
 import pytz
+from bot_keyboards import keyboard_days
+from bot_msg import CLUB_MSG, HELP_MSG, WELCOME_MSG
+from bot_reminder_handler import rem_handler, set_default
+from bot_report_conv_handler import conv_handler
+from config import SUPPORT_ID, TOKEN
+from parse_eve import HostEventHandler, format_events
 from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import (
     ApplicationBuilder,
@@ -13,13 +19,6 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-
-from bot_keyboards import keyboard_days
-from bot_msg import CLUB_MSG, HELP_MSG, WELCOME_MSG
-from bot_reminder_handler import rem_handler, set_default
-from bot_report_conv_handler import conv_handler
-from config import MY_ID, TOKEN
-from parse_eve import HostEventHandler, format_events
 
 EVENTS = HostEventHandler("./events.json")
 
@@ -31,7 +30,7 @@ logging.basicConfig(
 async def update_events_job(context: ContextTypes.DEFAULT_TYPE):
     EVENTS.update()
     await context.bot.send_message(
-        chat_id=MY_ID, text="(Job) Events should be up-to-date. (: "
+        chat_id=SUPPORT_ID, text="(Job) Events should be up-to-date. (: "
     )
 
 
@@ -83,7 +82,7 @@ async def handle_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
-        chat_id=MY_ID,
+        chat_id=SUPPORT_ID,
         text=f"New user {update.effective_user.first_name} {update.effective_user.last_name} - @{update.effective_user.username} . (:",
     )
     set_default(update.effective_chat.id, context)
@@ -105,7 +104,7 @@ if __name__ == "__main__":
     application = ApplicationBuilder().token(TOKEN).build()
 
     start_handler = CommandHandler("start", start)
-    update_h = CommandHandler("update", update_events, filters.User(MY_ID))
+    update_h = CommandHandler("update", update_events, filters.User(SUPPORT_ID))
     help_h = CommandHandler("help", get_help_msg)
     list_h = CommandHandler("list", get_club_list)
 
