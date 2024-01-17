@@ -3,6 +3,7 @@
 import datetime
 import logging
 
+import pytz
 from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import (
     ApplicationBuilder,
@@ -125,11 +126,9 @@ if __name__ == "__main__":
     application.add_handler(echo_handler)
 
     job = application.job_queue  # pip install "python-telegram-bot[job-queue]
-    daily_update_eve = job.run_daily(
-        update_events_job, datetime.time.fromisoformat("22:00:00+02:00")
-    )
-    daily_update_mor = job.run_daily(
-        update_events_job, datetime.time.fromisoformat("10:00:00+02:00")
-    )
+    daily_upadte_time = datetime.time(hour=22, tzinfo=pytz.timezone("Europe/Berlin"))
+    daily_update_eve = job.run_daily(update_events_job, daily_upadte_time)
+    daily_upadte_time = datetime.time(hour=10, tzinfo=pytz.timezone("Europe/Berlin"))
+    daily_update_eve = job.run_daily(update_events_job, daily_upadte_time)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
