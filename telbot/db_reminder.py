@@ -1,5 +1,6 @@
 import datetime
 import sqlite3
+from typing import Dict, List, Optional, Union
 
 from config import DB_NAME
 
@@ -9,7 +10,7 @@ class ReminderDB:
         self._db_name = db_name
         self._create_tables()
 
-    def _create_tables(self):
+    def _create_tables(self) -> None:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -18,17 +19,17 @@ class ReminderDB:
                 state INTEGER)"""
             )
 
-    def _get_connection(self):
+    def _get_connection(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self._db_name)
         return conn
 
-    def _execute_query(self, query, params=None):
+    def _execute_query(self, query, params=None) -> None:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             _ = cursor.execute(query, params) if params else cursor.execute(query)
             conn.commit()
 
-    def _read_data(self, query, params=None):
+    def _read_data(self, query, params=None) -> List:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             result = (
@@ -38,7 +39,7 @@ class ReminderDB:
             )
             return result
 
-    def get_reminder(self, userid):
+    def get_reminder(self, userid) -> Optional[Dict[str, Union[int, datetime.time]]]:
         result = self._read_data("SELECT * FROM reminders WHERE userid=?", (userid,))
         if result:
             result = result[0]
@@ -51,13 +52,13 @@ class ReminderDB:
             return reminder
         return None
 
-    def set_reminder(self, userid: int, day: int, time: str):
+    def set_reminder(self, userid: int, day: int, time: str) -> None:
         self._execute_query(
             "REPLACE INTO reminders (userid, day, time, state) VALUES (?, ?, ?, ?)",
             (userid, day, time, 1),
         )
 
-    def toggle_state(self, userid: int):
+    def toggle_state(self, userid: int) -> None:
         state = self._read_data(
             "SELECT state FROM reminders WHERE userid=?", (userid,)
         )[0][0]
