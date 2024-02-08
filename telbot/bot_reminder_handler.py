@@ -16,9 +16,12 @@ from bot_keyboards import (
     keyboard_reminder_conf,
     keyboard_reminder_days,
 )
+from config import DB_NAME
+from db_reminder import ReminderDB
 from telegramtimepicker import TimePicker
 
 timepicker = TimePicker()
+reminder_db = ReminderDB(DB_NAME)
 
 REMINDER_CONF, REMINDER_CHOICE, REMINDER_DAY, REMINDER_TIME = range(4)
 

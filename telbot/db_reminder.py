@@ -1,6 +1,8 @@
 import datetime
 import sqlite3
 
+from config import DB_NAME
+
 
 class ReminderDB:
     def __init__(self, db_name):
@@ -73,5 +75,5 @@ class ReminderDB:
 
 
 if __name__ == "__main__":
-    db = ReminderDB("evenparvie_rem_db.sqlite")
+    db = ReminderDB(DB_NAME)
     db.list_reminders()
