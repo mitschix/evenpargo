@@ -43,7 +43,7 @@ class ReminderDB:
             reminder = {
                 "userid": result[0],
                 "day": result[1],
-                "time": datetime.datetime.strptime(result[2], "%H:%M").time(),
+                "time": datetime.datetime.strptime(result[2], "%H:%M:%S").time(),
                 "state": result[3],
             }
             return reminder
