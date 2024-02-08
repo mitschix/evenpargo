@@ -23,12 +23,14 @@ keyboard_reminder_conf = [
     [
         InlineKeyboardButton("Toggle", callback_data="rem_toggle"),
         InlineKeyboardButton("Change", callback_data="rem_change"),
+        InlineKeyboardButton("Cancel", callback_data="rem_cancel"),
     ],
 ]
 keyboard_reminder_choice = [
     [
         InlineKeyboardButton("Default", callback_data="rem_default"),
         InlineKeyboardButton("Custom", callback_data="rem_custom"),
+        InlineKeyboardButton("Cancel", callback_data="rem_cancel"),
     ],
 ]
 

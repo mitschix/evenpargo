@@ -166,6 +166,13 @@ async def handle_rem_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             parse_mode="Markdown",
         )
         return ConversationHandler.END
+    elif option == "cancel":
+        await context.bot.edit_message_text(
+            chat_id=chat_id,
+            message_id=update.callback_query.message.message_id,
+            text="Reminder settings cancelled.",
+        )
+        return_code = ConversationHandler.END
 
     await context.bot.edit_message_text(
         chat_id=chat_id,
@@ -197,6 +204,9 @@ async def handle_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         text_msg = "📅 Please choose the day you wish to be reminded:"
         reply_markup = InlineKeyboardMarkup(keyboard_reminder_days)
         return_code = REMINDER_DAY
+    elif option == "cancel":
+        text_msg = "Reminder settings cancelled."
+        return_code = ConversationHandler.END
     else:
         text_msg = "Something went wrong. :/"
         return_code = ConversationHandler.END
