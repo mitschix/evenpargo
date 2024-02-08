@@ -49,7 +49,7 @@ class ReminderDB:
             return reminder
         return None
 
-    def set_reminder(self, userid: int, day: int, time: datetime.time):
+    def set_reminder(self, userid: int, day: int, time: str):
         self._execute_query(
             "REPLACE INTO reminders (userid, day, time, state) VALUES (?, ?, ?, ?)",
             (userid, day, time, 1),
