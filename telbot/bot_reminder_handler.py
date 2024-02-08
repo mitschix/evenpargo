@@ -36,6 +36,14 @@ DAY_MAPPING = [
 ]
 
 
+def set_existing_reminders(app_context: ContextTypes.DEFAULT_TYPE):
+    reminders = reminder_db.all_active_reminders()
+    for reminder in reminders:
+        userid, rem_day, str_rem_time, _ = reminder
+        rem_time = datetime.datetime.strptime(str_rem_time, "%H:%M:%S").time()
+        set_reminder(userid, rem_day, rem_time, app_context)
+
+
 async def reminder_events(context: ContextTypes.DEFAULT_TYPE) -> None:
     fri_events = format_events(EVENTS.get_events_per_day("Friday"))
     sat_events = format_events(EVENTS.get_events_per_day("Saturday"))

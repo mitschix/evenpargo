@@ -13,7 +13,7 @@ from telegram.ext import (
 
 from bot_event_handler import event_get_h, event_show_h, event_update_h, set_update_jobs
 from bot_msg import CLUB_MSG, HELP_MSG, WELCOME_MSG
-from bot_reminder_handler import rem_handler, set_default
+from bot_reminder_handler import rem_handler, set_default, set_existing_reminders
 from bot_report_conv_handler import conv_handler
 from config import SUPPORT_ID, TOKEN
 
@@ -85,5 +85,6 @@ if __name__ == "__main__":
 
     jobq = application.job_queue  # pip install "python-telegram-bot[job-queue]
     set_update_jobs(jobq)
+    set_existing_reminders(application)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

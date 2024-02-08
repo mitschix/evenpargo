@@ -80,6 +80,9 @@ class ReminderDB:
     def list_reminders(self) -> None:
         print(self._read_data("SELECT * FROM reminders"))
 
+    def all_active_reminders(self) -> List:
+        return self._read_data("SELECT * FROM reminders WHERE state = 1")
+
 
 if __name__ == "__main__":
     db = ReminderDB(DB_NAME)
