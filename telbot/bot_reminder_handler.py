@@ -225,20 +225,22 @@ async def handle_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 async def start_rem_conf(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     chat_id = update.message.chat_id
 
-    exists, _ = check_if_exist(str(chat_id), context)
-
-    state_text, state_icon = ("*ON*", "🟢") if exists else ("*OFF*", "❌")
     curr_rem_info = reminder_db.get_reminder(chat_id)
     if curr_rem_info:
         curr_rem_text = f"\n🗒️ Current reminder: \
 _{DAY_MAPPING[curr_rem_info.get('day',0)]}, \
 {curr_rem_info.get('time')}_ !"
+
+        exists, _ = check_if_exist(str(chat_id), context)
+        state_text, state_icon = ("*ON*", "🟢") if exists else ("*OFF*", "❌")
+        state_info = f"{state_icon} Your reminder is currently set to {state_text}.\n"
     else:
-        curr_rem_text = "\n🤷 No reminder configured!"
+        curr_rem_text = "\n🤐 No reminder configured!"
+        state_info = ""
 
     reply_markup = InlineKeyboardMarkup(keyboard_reminder_conf)
     await update.message.reply_text(
-        text=f"{state_icon} Your reminder is currently set to {state_text}. What do you want to do?\n{curr_rem_text}",
+        text=f"What do you want to do?\n{state_info}{curr_rem_text}",
         parse_mode="Markdown",
         reply_markup=reply_markup,
     )
