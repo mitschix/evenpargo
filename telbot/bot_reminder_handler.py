@@ -82,6 +82,7 @@ def set_reminder(
     rem_day: int,
     rem_time: datetime.time,
     context: ContextTypes.DEFAULT_TYPE,
+    set_new: bool = True,
 ) -> None:
     _ = remove_job_if_exists(str(chat_id), context)
     context.job_queue.run_daily(
@@ -91,6 +92,8 @@ def set_reminder(
         chat_id=chat_id,
         name=str(chat_id),
     )
+    if set_new:
+        reminder_db.set_reminder(chat_id, rem_day, str(rem_time))
 
 
 def set_default(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -182,6 +185,7 @@ async def handle_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     reply_markup = None
     if option == "toggle":
         job_removed = remove_job_if_exists(str(chat_id), context)
+        reminder_db.toggle_state(chat_id)
         if job_removed:
             text_msg = "❌ Reminder deactivated."
             return_code = ConversationHandler.END
