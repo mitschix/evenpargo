@@ -23,6 +23,7 @@ keyboard_reminder_conf = [
     [
         InlineKeyboardButton("Toggle", callback_data="rem_toggle"),
         InlineKeyboardButton("Change", callback_data="rem_change"),
+        InlineKeyboardButton("Delete", callback_data="rem_delete"),
         InlineKeyboardButton("Cancel", callback_data="rem_cancel"),
     ],
 ]

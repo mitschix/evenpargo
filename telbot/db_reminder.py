@@ -70,7 +70,13 @@ class ReminderDB:
             ),
         )
 
-    def list_reminders(self):
+    def delete_reminder_by_user_id(self, userid: int) -> None:
+        """
+        Deletes an entry from the database table given its userid.
+        """
+        self._execute_query("DELETE FROM reminders WHERE userid = ?", (userid,))
+
+    def list_reminders(self) -> None:
         print(self._read_data("SELECT * FROM reminders"))
 
 

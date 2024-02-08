@@ -228,6 +228,10 @@ async def handle_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif option == "cancel":
         text_msg = "Reminder settings cancelled."
         return_code = ConversationHandler.END
+    elif option == "delete":
+        reminder_db.delete_reminder_by_user_id(chat_id)
+        text_msg = "🔕 Reminder deleted."
+        return_code = ConversationHandler.END
     else:
         text_msg = "Something went wrong. :/"
         return_code = ConversationHandler.END
