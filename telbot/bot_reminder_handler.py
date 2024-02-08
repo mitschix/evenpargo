@@ -238,6 +238,7 @@ async def handle_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         return_code = ConversationHandler.END
     elif option == "delete":
         reminder_db.delete_reminder_by_user_id(chat_id)
+        _ = remove_job_if_exists(str(chat_id), context)
         text_msg = "🔕 Reminder deleted."
         return_code = ConversationHandler.END
     else:
