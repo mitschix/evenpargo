@@ -192,14 +192,35 @@ async def handle_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     reply_markup = None
     if option == "toggle":
         job_removed = remove_job_if_exists(str(chat_id), context)
-        reminder_db.toggle_state(chat_id)
         if job_removed:
+            reminder_db.toggle_state(chat_id)
             text_msg = "❌ Reminder deactivated."
             return_code = ConversationHandler.END
         else:
-            text_msg = "Do you wish to active the *default* reminder (_Thursday, 18:00_) or set a *custom* time?"
-            reply_markup = InlineKeyboardMarkup(keyboard_reminder_choice)
-            return_code = REMINDER_CHOICE
+            current_rem = reminder_db.get_reminder(chat_id)
+            if current_rem:
+                rem_day = current_rem.get("day", 0)
+                rem_time = current_rem.get("time", datetime.time(hour=18))
+                set_reminder(
+                    current_rem.get("userid", 0),
+                    rem_day,
+                    rem_time,
+                    context,
+                    set_new=False,
+                )
+                exists, _ = check_if_exist(str(chat_id), context)
+                if exists:
+                    reminder_db.toggle_state(chat_id)
+                    text_msg = f"🟢 Reminder activated: _{DAY_MAPPING[rem_day]}, {str(rem_time)}_ !"
+                    return_code = ConversationHandler.END
+                else:
+                    text_msg = "🙈 Something went wrong. Please set a new reminder!\n\nDo you wish to active the *default* reminder (_Thursday, 18:00_) or set a *custom* time?"
+                    reply_markup = InlineKeyboardMarkup(keyboard_reminder_choice)
+                    return_code = REMINDER_CHOICE
+            else:
+                text_msg = "🤷 No reminder found.\n\nDo you wish to active the *default* reminder (_Thursday, 18:00_) or set a *custom* time?"
+                reply_markup = InlineKeyboardMarkup(keyboard_reminder_choice)
+                return_code = REMINDER_CHOICE
     elif option == "change":
         text_msg = "📅 Please choose the day you wish to be reminded:"
         reply_markup = InlineKeyboardMarkup(keyboard_reminder_days)
