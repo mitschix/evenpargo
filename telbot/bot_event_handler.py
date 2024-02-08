@@ -1,9 +1,6 @@
 import datetime
 
 import pytz
-from bot_keyboards import keyboard_days
-from config import SUPPORT_ID
-from parse_eve import HostEventHandler, format_events
 from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -12,6 +9,10 @@ from telegram.ext import (
     JobQueue,
     filters,
 )
+
+from bot_keyboards import keyboard_days
+from config import SUPPORT_ID
+from parse_eve import HostEventHandler, format_events
 
 EVENTS = HostEventHandler("./events.json")
 

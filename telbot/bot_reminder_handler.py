@@ -2,18 +2,19 @@ import datetime
 from typing import List, Tuple
 
 import pytz
-from bot_event_handler import EVENTS, format_events
-from bot_keyboards import (
-    keyboard_reminder_choice,
-    keyboard_reminder_conf,
-    keyboard_reminder_days,
-)
 from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import (
     CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
     ConversationHandler,
+)
+
+from bot_event_handler import EVENTS, format_events
+from bot_keyboards import (
+    keyboard_reminder_choice,
+    keyboard_reminder_conf,
+    keyboard_reminder_days,
 )
 from telegramtimepicker import TimePicker
 
