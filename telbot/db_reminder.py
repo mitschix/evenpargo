@@ -59,9 +59,10 @@ class ReminderDB:
         )
 
     def toggle_state(self, userid: int) -> None:
-        state = self._read_data(
-            "SELECT state FROM reminders WHERE userid=?", (userid,)
-        )[0][0]
+        res = self._read_data("SELECT state FROM reminders WHERE userid=?", (userid,))
+        if not res:
+            return None
+        state = res[0][0]
         new_state = 1 if state == 0 else 0
         self._execute_query(
             "UPDATE reminders SET state=? WHERE userid=?",
