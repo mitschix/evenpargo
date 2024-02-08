@@ -172,7 +172,7 @@ async def handle_rem_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             message_id=update.callback_query.message.message_id,
             text="Reminder settings cancelled.",
         )
-        return_code = ConversationHandler.END
+        return ConversationHandler.END
 
     await context.bot.edit_message_text(
         chat_id=chat_id,
