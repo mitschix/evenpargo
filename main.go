@@ -256,6 +256,31 @@ func get_exil() []EV_Day {
 	return events
 }
 
+func fix_date(input string) string {
+	month_mapping := make(map[string]string)
+
+	month_mapping["Januar"] = "Jänner"
+	month_mapping["Februar"] = "Feber"
+	// should not have a special short name
+	// month_mapping["März"] = ""
+	// unknown
+	// month_mapping["April"] = 4
+	// month_mapping["Mai"] = 5
+	// month_mapping["Juni"] = 6
+	// month_mapping["Juli"] = 7
+	// month_mapping["August"] = 8
+	// month_mapping["September"] = 9
+	// month_mapping["Oktober"] = 10
+	// month_mapping["November"] = 11
+	// month_mapping["Dezember"] = 12
+
+	for en_month, de_month := range month_mapping {
+		input = strings.Replace(input, en_month, de_month, 1)
+	}
+
+	return input
+}
+
 func get_werk() []EV_Day {
 	events := []EV_Day{}
 
@@ -288,7 +313,7 @@ func get_werk() []EV_Day {
 			}
 			for _, date := range weekendDates {
 				tmp_date := monday.Format(date, "02. January", monday.LocaleDeDE)
-				tmp_date = strings.Replace(tmp_date, "Januar", "Jänner", 1)
+				tmp_date = fix_date(tmp_date)
 				if ev_day == date.Weekday().String() && strings.Contains(day, tmp_date) {
 					event_info := event{
 						Title: title,
