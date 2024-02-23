@@ -48,7 +48,9 @@ async def reminder_events(context: ContextTypes.DEFAULT_TYPE) -> None:
     fri_events = format_events(EVENTS.get_events_per_day("Friday"))
     sat_events = format_events(EVENTS.get_events_per_day("Saturday"))
     sun_events = format_events(EVENTS.get_events_per_day("Sunday"))
-    event_msg = f"""*=== Friday ===*
+    event_msg = f"""*==== 🔊 EvenParVIE Event Reminder 🎧 ====*
+
+*=== Friday ===*
 
 {fri_events}
 
@@ -58,7 +60,9 @@ async def reminder_events(context: ContextTypes.DEFAULT_TYPE) -> None:
 
 *=== Sunday ===*
 
-{sun_events}"""
+{sun_events}
+
+🗒 To configure your reminder you can use /reminder. """
     await context.bot.send_message(
         chat_id=context.job.chat_id,
         text=event_msg,
