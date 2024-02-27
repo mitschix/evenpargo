@@ -51,58 +51,6 @@ func add_event_info(events []EV_Day, host string, day string, event_info event) 
 	return events
 }
 
-func get_fluc() []EV_Day {
-	events := []EV_Day{}
-	tn := time.Now().UTC()
-	_, week := tn.ISOWeek()
-
-	coll := colly.NewCollector()
-	coll.OnRequest(func(req *colly.Request) {
-		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
-	})
-	coll.OnHTML("li.datum", func(h *colly.HTMLElement) {
-		is_weekend := false
-		ev_day := ""
-
-		selection := h.DOM
-		day := strings.TrimSpace(selection.Find("span.tag").Text())
-		sel_wanne := selection.Find("ul.info").Find("li.wanne")
-		info := strings.TrimSpace(sel_wanne.Text())
-		ev_link := sel_wanne.Find("a[href]")
-		link, exists := ev_link.Attr("href")
-		url := ""
-		if exists {
-			url = link
-		}
-
-		switch day {
-		case "Freitag":
-			ev_day = "Friday"
-			is_weekend = true
-		case "Samstag":
-			ev_day = "Saturday"
-			is_weekend = true
-		default:
-		}
-
-		if is_weekend && info != "" {
-			info_splitted := strings.SplitN(info, " ", 2)
-
-			event_info := event{
-				Title: info_splitted[1],
-				Time:  strings.TrimRight(info_splitted[0], ":"),
-				URL:   url,
-			}
-			events = add_event_info(events, "Fluc Wanne", ev_day, event_info)
-		}
-	})
-	coll.OnError(func(r *colly.Response, err error) {
-		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
-	})
-	coll.Visit(fmt.Sprintf("https://fluc.at/programm/2024_Flucwoche%02d.html", week))
-	return events
-}
-
 func getWeekendDates() []time.Time {
 	var weekendDates []time.Time
 
@@ -124,6 +72,54 @@ func getWeekendDates() []time.Time {
 	weekendDates = append(weekendDates, friday, saturday, sunday)
 
 	return weekendDates
+}
+
+func get_fluc() []EV_Day {
+	events := []EV_Day{}
+
+	coll := colly.NewCollector()
+	coll.OnRequest(func(req *colly.Request) {
+		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
+	})
+	coll.OnHTML("section.events-block", func(h *colly.HTMLElement) {
+		selection := h.DOM
+		ev_block := selection.Find("div.container")
+		for _, date := range weekendDates {
+			tmp_date := date.Format("02.01.06")
+
+			ev_block.Find("div.day-title").Each(func(_ int, day *goquery.Selection) {
+				cur_text := strings.TrimSpace(day.Text())
+				if strings.Contains(cur_text, tmp_date) {
+					ev_list := day.Next()
+					ev_list.Find("li.card").Each(func(_ int, eve_info *goquery.Selection) {
+						loc := eve_info.Find("div.location").Text()
+						if strings.Contains(loc, "Wanne") {
+							ev_time := strings.TrimSpace(eve_info.Find("div.date").Text())
+							title := strings.TrimSpace(eve_info.Find("div.title-dimension").Text())
+							ev_link := eve_info.Find("a[href]")
+							link, exists := ev_link.Attr("href")
+							url := ""
+							if exists {
+								url = fmt.Sprintf("https://flucc.at%s", link)
+							}
+							event_info := event{
+								Title: title,
+								Time:  ev_time,
+								URL:   url,
+							}
+							events = add_event_info(events, "Fluc Wanne", date.Weekday().String(), event_info)
+						}
+
+					})
+				}
+			})
+		}
+	})
+	coll.OnError(func(r *colly.Response, err error) {
+		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
+	})
+	coll.Visit("https://flucc.at")
+	return events
 }
 
 func get_fish() []EV_Day {
