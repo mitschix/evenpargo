@@ -11,7 +11,7 @@ from telegram.ext import (
 )
 
 from bot_keyboards import keyboard_days
-from config import SUPPORT_ID
+from config import MY_ID, SUPPORT_ID
 from parse_eve import HostEventHandler, format_events
 
 EVENTS = HostEventHandler("./events.json")
@@ -59,6 +59,8 @@ def set_update_jobs(jobq: JobQueue) -> None:
     _ = jobq.run_daily(update_events_job, daily_upadte_time)
 
 
-event_update_h = CommandHandler("update", update_events, filters.User(SUPPORT_ID))
+event_update_h = CommandHandler(
+    "update", update_events, filters.User([SUPPORT_ID, MY_ID])
+)
 event_get_h = CommandHandler("events", get_events)
 event_show_h = CallbackQueryHandler(handle_events)
