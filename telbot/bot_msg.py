@@ -48,7 +48,7 @@ Via their own website:
 - [BlackMarket](http://www.blackmarket.at/?page_id=49)
 - [Exil](https://exil1.ticket.io/)
 - [Flex](https://flex.at/events/monat/)
-- [Fluc Wanne](https://fluc.at/programm/2024_Flucwoche01.html)
+- [Fluc Wanne](https://flucc.at/)
 - [Grelle Forelle](https://www.grelleforelle.com/programm/)
 - [Rhiz](https://rhiz.wien/programm/)
 - [SASS](https://sassvienna.com/programm)
