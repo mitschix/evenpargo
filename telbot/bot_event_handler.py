@@ -35,21 +35,29 @@ async def get_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard_days)
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Which day you want to choose?",
+        text="🧐 Which day do you want to check?",
         reply_markup=reply_markup,
     )
 
 
 async def handle_events(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    reply_markup = InlineKeyboardMarkup(keyboard_days)
     q_data = update.callback_query.data
     q_day = q_data.split("_")[1].title()
-    event_msg = f"*=== {q_day} ===*\n" + format_events(EVENTS.get_events_per_day(q_day))
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=event_msg,
-        parse_mode="Markdown",
-        disable_web_page_preview=True,
+    event_msg = (
+        f"*=== {q_day} ===*\n"
+        + format_events(EVENTS.get_events_per_day(q_day))
+        + "\n\n😁 Check another day?"
     )
+    if q_day not in update.callback_query.message.text:
+        await context.bot.edit_message_text(
+            chat_id=update.effective_chat.id,
+            message_id=update.callback_query.message.message_id,
+            text=event_msg,
+            parse_mode="Markdown",
+            disable_web_page_preview=True,
+            reply_markup=reply_markup,
+        )
 
 
 def set_update_jobs(jobq: JobQueue) -> None:
