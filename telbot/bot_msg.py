@@ -30,7 +30,6 @@ Here is a list of features I have in mind that will be implemented sooner or lat
 - Add a custom event to distribute it to others.
 - Prefilter the clubs you wish to get updates about.
 - Get updates about the next week.
-- Persistent reminder settings.
 - Private channel to talk to others or exchange further event information.
 
 *Feedback/Issues/Requests?*
