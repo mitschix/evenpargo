@@ -51,4 +51,4 @@ def format_events(events: T_EVENTS) -> str:
             else:
                 out += f"\n- {val[1]}: {val[0]}"
         out += f"\n{10*'-----'}\n"
-    return out.replace("_", r"\_")
+    return out
