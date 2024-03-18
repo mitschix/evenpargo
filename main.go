@@ -95,7 +95,7 @@ func get_fluc() []EV_Day {
 						loc := eve_info.Find("div.location").Text()
 						if strings.Contains(loc, "Wanne") {
 							ev_time := strings.TrimSpace(eve_info.Find("div.date").Text())
-							title := strings.TrimSpace(eve_info.Find("div.title-dimension").Text())
+							title := strings.TrimSpace(eve_info.Find("div.title-dimension").Find("h4").First().Text())
 							ev_link := eve_info.Find("a[href]")
 							link, exists := ev_link.Attr("href")
 							url := ""
