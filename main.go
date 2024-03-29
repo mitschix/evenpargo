@@ -305,6 +305,8 @@ func get_werk() []EV_Day {
 				ev_day = "Friday"
 			case strings.HasPrefix(day, "Samstag"):
 				ev_day = "Saturday"
+			case strings.HasPrefix(day, "Sonntag"):
+				ev_day = "Sunday"
 			default:
 			}
 			for _, date := range weekendDates {
