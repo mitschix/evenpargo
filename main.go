@@ -74,7 +74,7 @@ func getWeekendDates() []time.Time {
 	return weekendDates
 }
 
-func get_fluc() []EV_Day {
+func get_flucc(selector string) []EV_Day {
 	events := []EV_Day{}
 
 	coll := colly.NewCollector()
@@ -92,9 +92,12 @@ func get_fluc() []EV_Day {
 				if strings.Contains(cur_text, tmp_date) {
 					ev_list := day.Next()
 					ev_list.Find("li.card").Each(func(_ int, eve_info *goquery.Selection) {
-						loc := eve_info.Find("div.location").Text()
-						if strings.Contains(loc, "Wanne") {
-							ev_time := strings.TrimSpace(eve_info.Find("div.date").Text())
+						loc := strings.TrimSpace(eve_info.Find("div.location").Text())
+						if strings.Contains(loc, selector) {
+							ev_time := eve_info.Find("div.date").Text()
+							ev_time = strings.TrimSpace(ev_time)
+							ev_time = strings.ReplaceAll(ev_time, "\t", "")
+							ev_time = strings.ReplaceAll(ev_time, "\n", "")
 							title := strings.TrimSpace(eve_info.Find("div.title-dimension").Find("h4").First().Text())
 							ev_link := eve_info.Find("a[href]")
 							link, exists := ev_link.Attr("href")
@@ -107,7 +110,8 @@ func get_fluc() []EV_Day {
 								Time:  ev_time,
 								URL:   url,
 							}
-							events = add_event_info(events, "Fluc Wanne", date.Weekday().String(), event_info)
+							host := fmt.Sprintf("Flucc %s", selector)
+							events = add_event_info(events, host, date.Weekday().String(), event_info)
 						}
 
 					})
@@ -595,7 +599,6 @@ func get_all_events() events {
 	eventChan := make(chan []EV_Day)
 
 	functions := []func() []EV_Day{
-		get_fluc,
 		get_fish,
 		get_flex,
 		get_werk,
@@ -619,6 +622,14 @@ func get_all_events() events {
 		go func(club string) {
 			eventChan <- get_freytag(club)
 		}(club_name)
+	}
+
+	// run freytag separate since it has args -> also as gorotines
+	flucc_locations := []string{"Wanne", "Deck"}
+	for _, location := range flucc_locations {
+		go func(loc string) {
+			eventChan <- get_flucc(loc)
+		}(location)
 	}
 
 	for i := 0; i < len(functions)+len(frey_clubs); i++ {
