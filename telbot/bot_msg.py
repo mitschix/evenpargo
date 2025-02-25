@@ -55,6 +55,7 @@ Via their own website:
 - [theLoft](https://www.theloft.at/programm/)
 
 Via frey-tag.at:
+- [Jolly Roger](https://frey-tag.at/locations/jolly-roger)
 - [Kramladen](https://frey-tag.at/locations/kramladen)
 - [O-Klub](https://frey-tag.at/locations/o-der-klub)
 - [Pratersauna](https://frey-tag.at/locations/pratersauna)
