@@ -24,7 +24,10 @@ class HostEventHandler(object):
 
         with self.json_path.open(encoding="utf8") as j_f:
             content = json.load(j_f)
-        self.events = content.get("host_events")
+
+        self.events = sorted(
+            content.get("host_events"), key=lambda event: event["host"]
+        )
 
     def get_events_per_day(self, day: str) -> T_EVENTS:
         events = []
@@ -47,8 +50,12 @@ def format_events(events: T_EVENTS) -> str:
         for info in event_infos:
             val = list(info.values())
             if val[2]:
-                out += f"\n- {val[1]}: [{val[0].replace('[','(').replace(']',')')}]({val[2]})"
+                out += f"\n- {val[1]}: [{val[0].replace('[', '(').replace(']', ')')}]({val[2]})"
             else:
                 out += f"\n- {val[1]}: {val[0]}"
-        out += f"\n{10*'-----'}\n"
+        out += f"\n{10 * '-----'}\n"
     return out
+
+
+if __name__ == "__main__":
+    EVENTS = HostEventHandler("./events.json")
