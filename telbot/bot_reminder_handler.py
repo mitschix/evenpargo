@@ -10,7 +10,7 @@ from telegram.ext import (
     ConversationHandler,
 )
 
-from bot_event_handler import EVENTS, format_events
+from bot_event_handler import EVENTS
 from bot_keyboards import (
     keyboard_reminder_choice,
     keyboard_reminder_conf,
@@ -18,6 +18,7 @@ from bot_keyboards import (
 )
 from config import DB_NAME
 from db_reminder import ReminderDB
+from parse_eve import format_events
 from telegramtimepicker import TimePicker
 
 timepicker = TimePicker()
