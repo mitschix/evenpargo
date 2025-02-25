@@ -218,40 +218,6 @@ func get_flex() []EV_Day {
 	return events
 }
 
-func get_exil() []EV_Day {
-	events := []EV_Day{}
-
-	coll := colly.NewCollector()
-	coll.OnRequest(func(req *colly.Request) {
-		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
-	})
-
-	coll.OnHTML("tr.container", func(h *colly.HTMLElement) {
-		selection := h.DOM
-		title := strings.TrimSpace(selection.Find("h3").Text())
-		day := selection.Find("span:not([class])").First().Text()
-		time := selection.Find("span:not([class])").Eq(1).Text()
-		for _, date := range weekendDates {
-			tmp_date := date.Format("02/01/2006")
-			if strings.Contains(day, tmp_date) {
-				event_info := event{
-					Title: title,
-					Time:  time,
-					URL:   "",
-				}
-				events = add_event_info(events, "Exil", date.Weekday().String(), event_info)
-			}
-		}
-	})
-
-	coll.OnError(func(r *colly.Response, err error) {
-		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
-	})
-
-	coll.Visit("https://exil1.ticket.io/")
-	return events
-}
-
 func fix_date(input string) string {
 	month_mapping := make(map[string]string)
 
@@ -632,7 +598,6 @@ func get_all_events() events {
 		get_fluc,
 		get_fish,
 		get_flex,
-		// get_exil, // FIXME: layout changed
 		get_werk,
 		get_loft,
 		get_black,
@@ -649,7 +614,7 @@ func get_all_events() events {
 	}
 
 	// run freytag separate since it has args -> also as gorotines
-	frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen", "o-der-klub", "pratersauna", "jolly-roger"}
+	frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen", "o-der-klub", "pratersauna", "jolly-roger", "club-exil"}
 	for _, club_name := range frey_clubs {
 		go func(club string) {
 			eventChan <- get_freytag(club)
