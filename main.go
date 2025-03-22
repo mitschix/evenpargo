@@ -94,10 +94,11 @@ func get_flucc(selector string) []EV_Day {
 					ev_list.Find("li.card").Each(func(_ int, eve_info *goquery.Selection) {
 						loc := strings.TrimSpace(eve_info.Find("div.location").Text())
 						if strings.Contains(loc, selector) {
-							ev_time := eve_info.Find("div.date").Text()
+							ev_time := eve_info.Find("div.time-location-info").Text()
 							ev_time = strings.TrimSpace(ev_time)
 							ev_time = strings.ReplaceAll(ev_time, "\t", "")
 							ev_time = strings.ReplaceAll(ev_time, "\n", "")
+							ev_time = strings.Split(ev_time, "@")[0]
 							title := strings.TrimSpace(eve_info.Find("div.title-dimension").Find("h4").First().Text())
 							ev_link := eve_info.Find("a[href]")
 							link, exists := ev_link.Attr("href")
