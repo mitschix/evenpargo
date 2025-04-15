@@ -633,7 +633,7 @@ func get_all_events() events {
 		}(location)
 	}
 
-	for i := 0; i < len(functions)+len(frey_clubs); i++ {
+	for i := 0; i < len(functions)+len(frey_clubs)+len(flucc_locations); i++ {
 		cur_events.Events = append(cur_events.Events, <-eventChan...)
 	}
 
