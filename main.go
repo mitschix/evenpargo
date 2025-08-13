@@ -269,30 +269,26 @@ func get_werk() []EV_Day {
 		day := selection.Find("ul.preview-item--information").Find("li:not([class])").First().Text()
 		time := selection.Find("ul.preview-item--information").Find("li:not([class])").Eq(1).Text()
 		time = strings.ReplaceAll(time, " Uhr", "")
-		location := selection.Find("p:not([class])").Text()
-		if location == "CLUB" {
-			switch {
-			case strings.HasPrefix(day, "Freitag"):
-				ev_day = "Friday"
-			case strings.HasPrefix(day, "Samstag"):
-				ev_day = "Saturday"
-			case strings.HasPrefix(day, "Sonntag"):
-				ev_day = "Sunday"
-			default:
-			}
-			for _, date := range weekendDates {
-				tmp_date := monday.Format(date, "02. January", monday.LocaleDeDE)
-				tmp_date = fix_date(tmp_date)
-				if ev_day == date.Weekday().String() && strings.Contains(day, tmp_date) {
-					event_info := event{
-						Title: title,
-						Time:  time,
-						URL:   url,
-					}
-					events = add_event_info(events, "dasWerk", date.Weekday().String(), event_info)
+		switch {
+		case strings.HasPrefix(day, "Freitag"):
+			ev_day = "Friday"
+		case strings.HasPrefix(day, "Samstag"):
+			ev_day = "Saturday"
+		case strings.HasPrefix(day, "Sonntag"):
+			ev_day = "Sunday"
+		default:
+		}
+		for _, date := range weekendDates {
+			tmp_date := monday.Format(date, "02. January", monday.LocaleDeDE)
+			tmp_date = fix_date(tmp_date)
+			if ev_day == date.Weekday().String() && strings.Contains(day, tmp_date) {
+				event_info := event{
+					Title: title,
+					Time:  time,
+					URL:   url,
 				}
+				events = add_event_info(events, "dasWerk", date.Weekday().String(), event_info)
 			}
-
 		}
 
 	})
