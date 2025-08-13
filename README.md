@@ -16,7 +16,7 @@ go build -o telbot
 ### Currently parsed websites:
 
 - [B72](https://www.b72.at/program)
-- [BlackMarket](http://www.blackmarket.at/?page_id=49)
+- [-BlackMarket- (not available)](http://www.blackmarket.at/?page_id=49)
 - [Exil](https://exil1.ticket.io/)
 - [Flex](https://flex.at/events/monat/)
 - [Fluc Wanne](https://fluc.at/programm/2024_Flucwoche01.html)

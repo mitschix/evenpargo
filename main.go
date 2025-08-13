@@ -600,7 +600,7 @@ func get_all_events() events {
 		get_flex,
 		get_werk,
 		get_loft,
-		get_black,
+		// get_black,
 		get_rhiz,
 		get_sass,
 		get_b72,

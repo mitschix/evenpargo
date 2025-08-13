@@ -44,7 +44,6 @@ CLUB_MSG = """The following clubs are currently checked for upcoming events:
 
 Via their own website:
 - [B72](https://www.b72.at/program)
-- [BlackMarket](http://www.blackmarket.at/?page_id=49)
 - [Exil](https://exil1.ticket.io/)
 - [Flex](https://flex.at/events/monat/)
 - [Fluc Wanne](https://flucc.at/)
@@ -63,5 +62,8 @@ Via frey-tag.at:
 - [Praterstrasse/PRST](https://frey-tag.at/locations/club-praterstrasse)
 - [club-u](https://frey-tag.at/locations/club-u)
 - [ponyhof](https://frey-tag.at/locations/ponyhof)
+
+Websites not available:
+- [BlackMarket](http://www.blackmarket.at/?page_id=49)
 
 If you are missing some clubs check /help to see how to request new ones and I will do my best to add them in future releases if possible."""
