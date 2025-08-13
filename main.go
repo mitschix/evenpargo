@@ -20,10 +20,10 @@ type event struct {
 }
 
 type events struct {
-	Events []EV_Day `json:"host_events"`
+	Events []EvDay `json:"host_events"`
 }
 
-type EV_Day struct {
+type EvDay struct {
 	Host   string  `json:"host"`
 	Day    string  `json:"day"`
 	Events []event `json:"events"`
@@ -31,20 +31,20 @@ type EV_Day struct {
 
 var weekendDates []time.Time
 
-func add_event_info(events []EV_Day, host string, day string, event_info event) []EV_Day {
+func addEventInfo(events []EvDay, host string, day string, eventInfo event) []EvDay {
 	found := false
 	for i, ev := range events {
 		if ev.Day == day {
-			events[i].Events = append(events[i].Events, event_info)
+			events[i].Events = append(events[i].Events, eventInfo)
 			found = true
 			break
 		}
 	}
 	if !found {
-		eve := EV_Day{
+		eve := EvDay{
 			Host:   host,
 			Day:    day,
-			Events: []event{event_info},
+			Events: []event{eventInfo},
 		}
 		events = append(events, eve)
 	}
@@ -74,8 +74,8 @@ func getWeekendDates() []time.Time {
 	return weekendDates
 }
 
-func get_flucc(selector string) []EV_Day {
-	events := []EV_Day{}
+func getClubFlucc(selector string) []EvDay {
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -83,36 +83,36 @@ func get_flucc(selector string) []EV_Day {
 	})
 	coll.OnHTML("section.events-block", func(h *colly.HTMLElement) {
 		selection := h.DOM
-		ev_block := selection.Find("div.container")
+		evBlock := selection.Find("div.container")
 		for _, date := range weekendDates {
-			tmp_date := date.Format("02.01.06")
+			tmpDate := date.Format("02.01.06")
 
-			ev_block.Find("div.day-title").Each(func(_ int, day *goquery.Selection) {
-				cur_text := strings.TrimSpace(day.Text())
-				if strings.Contains(cur_text, tmp_date) {
-					ev_list := day.Next()
-					ev_list.Find("li.card").Each(func(_ int, eve_info *goquery.Selection) {
+			evBlock.Find("div.day-title").Each(func(_ int, day *goquery.Selection) {
+				currentText := strings.TrimSpace(day.Text())
+				if strings.Contains(currentText, tmpDate) {
+					evList := day.Next()
+					evList.Find("li.card").Each(func(_ int, eve_info *goquery.Selection) {
 						loc := strings.TrimSpace(eve_info.Find("div.location").Text())
 						if strings.Contains(loc, selector) {
-							ev_time := eve_info.Find("div.time-location-info").Text()
-							ev_time = strings.TrimSpace(ev_time)
-							ev_time = strings.ReplaceAll(ev_time, "\t", "")
-							ev_time = strings.ReplaceAll(ev_time, "\n", "")
-							ev_time = strings.Split(ev_time, "@")[0]
+							evTime := eve_info.Find("div.time-location-info").Text()
+							evTime = strings.TrimSpace(evTime)
+							evTime = strings.ReplaceAll(evTime, "\t", "")
+							evTime = strings.ReplaceAll(evTime, "\n", "")
+							evTime = strings.Split(evTime, "@")[0]
 							title := strings.TrimSpace(eve_info.Find("div.title-dimension").Find("h4").First().Text())
-							ev_link := eve_info.Find("a[href]")
-							link, exists := ev_link.Attr("href")
+							evLink := eve_info.Find("a[href]")
+							link, exists := evLink.Attr("href")
 							url := ""
 							if exists {
 								url = fmt.Sprintf("https://flucc.at%s", link)
 							}
-							event_info := event{
+							eventInfo := event{
 								Title: title,
-								Time:  ev_time,
+								Time:  evTime,
 								URL:   url,
 							}
 							host := fmt.Sprintf("Flucc %s", selector)
-							events = add_event_info(events, host, date.Weekday().String(), event_info)
+							events = addEventInfo(events, host, date.Weekday().String(), eventInfo)
 						}
 
 					})
@@ -127,45 +127,45 @@ func get_flucc(selector string) []EV_Day {
 	return events
 }
 
-func get_fish() []EV_Day {
-	events := []EV_Day{}
+func getClubFish() []EvDay {
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
 	})
 	coll.OnHTML("div.project", func(h *colly.HTMLElement) {
-		ev_time := ""
+		evTime := ""
 		selection := h.DOM
-		ev_text := selection.Find("h2")
-		full_text := ev_text.Text()
+		evText := selection.Find("h2")
+		fullText := evText.Text()
 		for _, date := range weekendDates {
-			tmp_date := date.Format("02/01")
-			if strings.HasPrefix(full_text, tmp_date) {
+			tmpDate := date.Format("02/01")
+			if strings.HasPrefix(fullText, tmpDate) {
 
-				ev_link := ev_text.Find("a[href]")
-				link, exists := ev_link.Attr("href")
+				evLink := evText.Find("a[href]")
+				link, exists := evLink.Attr("href")
 				if exists {
 					coll.OnHTML("div.et_pb_text", func(h *colly.HTMLElement) {
-						link_sel := h.DOM
-						link_sel.Find("p:not([class])").Each(func(_ int, s *goquery.Selection) {
-							cur_text := s.Text()
-							if strings.Contains(cur_text, "DOORS") {
-								ev_time = cur_text
+						linkSel := h.DOM
+						linkSel.Find("p:not([class])").Each(func(_ int, s *goquery.Selection) {
+							curText := s.Text()
+							if strings.Contains(curText, "DOORS") {
+								evTime = curText
 							}
 						})
 					})
 					coll.Visit(h.Request.AbsoluteURL(link))
 				}
 
-				title := strings.TrimSpace(strings.Trim(full_text, tmp_date))
-				ev_time = strings.Trim(ev_time, "DORS \n")
-				event_info := event{
+				title := strings.TrimSpace(strings.Trim(fullText, tmpDate))
+				evTime = strings.Trim(evTime, "DORS \n")
+				eventInfo := event{
 					Title: title,
-					Time:  ev_time,
+					Time:  evTime,
 					URL:   link,
 				}
-				events = add_event_info(events, "Grelle Forelle", date.Weekday().String(), event_info)
+				events = addEventInfo(events, "Grelle Forelle", date.Weekday().String(), eventInfo)
 			}
 		}
 	})
@@ -176,8 +176,8 @@ func get_fish() []EV_Day {
 	return events
 }
 
-func get_flex() []EV_Day {
-	events := []EV_Day{}
+func getClubFlex() []EvDay {
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -187,29 +187,29 @@ func get_flex() []EV_Day {
 	coll.OnHTML("div.tribe-events-calendar-month__day", func(h *colly.HTMLElement) {
 		selection := h.DOM
 		for _, date := range weekendDates {
-			tmp_date := date.Format("2006-01-02")
-			selection.Find(fmt.Sprintf("div#tribe-events-calendar-day-%s", tmp_date)).Each(
+			tmpDate := date.Format("2006-01-02")
+			selection.Find(fmt.Sprintf("div#tribe-events-calendar-day-%s", tmpDate)).Each(
 				func(_ int, sel_day *goquery.Selection) {
 					sel_day.Find("article.tribe-events-calendar-month__calendar-event").Each(
 						func(_ int, sel_art *goquery.Selection) {
 							time := strings.TrimSpace(sel_art.Find("div.tribe-events-calendar-month__calendar-event-datetime").Text())
 							time = strings.ReplaceAll(time, "\t", "")
 							time = strings.ReplaceAll(time, "\n", "")
-							sel_title := sel_art.Find("h3.tribe-events-calendar-month__calendar-event-title")
+							selTitle := sel_art.Find("h3.tribe-events-calendar-month__calendar-event-title")
 
-							ev_link := sel_title.Find("a[href]")
-							link, exists := ev_link.Attr("href")
+							evLink := selTitle.Find("a[href]")
+							link, exists := evLink.Attr("href")
 							url := ""
 							if exists {
 								url = link
 							}
-							title := strings.TrimSpace(sel_title.Text())
-							event_info := event{
+							title := strings.TrimSpace(selTitle.Text())
+							eventInfo := event{
 								Title: title,
 								Time:  time,
 								URL:   url,
 							}
-							events = add_event_info(events, "Flex", date.Weekday().String(), event_info)
+							events = addEventInfo(events, "Flex", date.Weekday().String(), eventInfo)
 						})
 
 				})
@@ -223,11 +223,11 @@ func get_flex() []EV_Day {
 	return events
 }
 
-func fix_date(input string) string {
-	month_mapping := make(map[string]string)
+func fixDate(input string) string {
+	monthMapping := make(map[string]string)
 
-	month_mapping["Januar"] = "Jänner"
-	month_mapping["Februar"] = "Feber"
+	monthMapping["Januar"] = "Jänner"
+	monthMapping["Februar"] = "Feber"
 	// should not have a special short name
 	// month_mapping["März"] = ""
 	// unknown
@@ -241,15 +241,15 @@ func fix_date(input string) string {
 	// month_mapping["November"] = 11
 	// month_mapping["Dezember"] = 12
 
-	for en_month, de_month := range month_mapping {
-		input = strings.Replace(input, en_month, de_month, 1)
+	for enMonth, deMonth := range monthMapping {
+		input = strings.Replace(input, enMonth, deMonth, 1)
 	}
 
 	return input
 }
 
-func get_werk() []EV_Day {
-	events := []EV_Day{}
+func getClubWerk() []EvDay {
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -257,11 +257,11 @@ func get_werk() []EV_Day {
 	})
 
 	coll.OnHTML("div.events--preview-item", func(h *colly.HTMLElement) {
-		ev_day := ""
+		evDay := ""
 		selection := h.DOM
 		title := strings.TrimSpace(selection.Find(".preview-item--headline").Text())
-		ev_link := selection.Find(".preview-item--link")
-		link, exists := ev_link.Attr("href")
+		evLink := selection.Find(".preview-item--link")
+		link, exists := evLink.Attr("href")
 		url := ""
 		if exists {
 			url = link
@@ -271,23 +271,23 @@ func get_werk() []EV_Day {
 		time = strings.ReplaceAll(time, " Uhr", "")
 		switch {
 		case strings.HasPrefix(day, "Freitag"):
-			ev_day = "Friday"
+			evDay = "Friday"
 		case strings.HasPrefix(day, "Samstag"):
-			ev_day = "Saturday"
+			evDay = "Saturday"
 		case strings.HasPrefix(day, "Sonntag"):
-			ev_day = "Sunday"
+			evDay = "Sunday"
 		default:
 		}
 		for _, date := range weekendDates {
-			tmp_date := monday.Format(date, "02. January", monday.LocaleDeDE)
-			tmp_date = fix_date(tmp_date)
-			if ev_day == date.Weekday().String() && strings.Contains(day, tmp_date) {
-				event_info := event{
+			tmpDate := monday.Format(date, "02. January", monday.LocaleDeDE)
+			tmpDate = fixDate(tmpDate)
+			if evDay == date.Weekday().String() && strings.Contains(day, tmpDate) {
+				eventInfo := event{
 					Title: title,
 					Time:  time,
 					URL:   url,
 				}
-				events = add_event_info(events, "dasWerk", date.Weekday().String(), event_info)
+				events = addEventInfo(events, "dasWerk", date.Weekday().String(), eventInfo)
 			}
 		}
 
@@ -301,8 +301,8 @@ func get_werk() []EV_Day {
 	return events
 }
 
-func get_loft() []EV_Day {
-	events := []EV_Day{}
+func getClubLoft() []EvDay {
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -323,14 +323,14 @@ func get_loft() []EV_Day {
 		}
 
 		for _, date := range weekendDates {
-			tmp_date := date.Format("02.1.2006")
-			if strings.Contains(day, tmp_date) {
-				event_info := event{
+			tmpDate := date.Format("02.1.2006")
+			if strings.Contains(day, tmpDate) {
+				eventInfo := event{
 					Title: fmt.Sprintf("%s (%s)", title, location),
 					Time:  time,
 					URL:   url,
 				}
-				events = add_event_info(events, "theLoft", date.Weekday().String(), event_info)
+				events = addEventInfo(events, "theLoft", date.Weekday().String(), eventInfo)
 			}
 		}
 	})
@@ -343,8 +343,8 @@ func get_loft() []EV_Day {
 	return events
 }
 
-func get_black() []EV_Day {
-	events := []EV_Day{}
+func getClubBlack() []EvDay { //lint:ignore U1000
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -354,29 +354,29 @@ func get_black() []EV_Day {
 	coll.OnHTML("p:not([class])", func(h *colly.HTMLElement) {
 		info := h.DOM.Text()
 		for _, date := range weekendDates {
-			tmp_date := date.Format("02.01.06")
-			if strings.Contains(info, tmp_date) {
+			tmpDate := date.Format("02.01.06")
+			if strings.Contains(info, tmpDate) {
 				splitted := strings.Split(info, " // ")
 				if len(splitted) != 3 {
 					fmt.Println("[e] could not parse blackmarket info")
 					return
 				}
-				title, ev_time := splitted[1], splitted[2]
-				ev_time = strings.ReplaceAll(ev_time, " UHR", "")
-				split_time := strings.Split(ev_time, "-")
-				if len(split_time) != 2 {
+				title, evTime := splitted[1], splitted[2]
+				evTime = strings.ReplaceAll(evTime, " UHR", "")
+				splittedTime := strings.Split(evTime, "-")
+				if len(splittedTime) != 2 {
 					fmt.Println("[e] could not parse blackmarket time")
 					return
 				}
-				start, _ := strconv.Atoi(split_time[0])
-				end, _ := strconv.Atoi(split_time[1])
-				full_time := fmt.Sprintf("%02d:00-%02d:00", start, end)
-				event_info := event{
+				start, _ := strconv.Atoi(splittedTime[0])
+				end, _ := strconv.Atoi(splittedTime[1])
+				fullTime := fmt.Sprintf("%02d:00-%02d:00", start, end)
+				eventInfo := event{
 					Title: title,
-					Time:  full_time,
+					Time:  fullTime,
 					URL:   "http://www.blackmarket.at/?page_id=49",
 				}
-				events = add_event_info(events, "Black Market", date.Weekday().String(), event_info)
+				events = addEventInfo(events, "Black Market", date.Weekday().String(), eventInfo)
 			}
 		}
 	})
@@ -389,8 +389,8 @@ func get_black() []EV_Day {
 	return events
 }
 
-func get_rhiz() []EV_Day {
-	events := []EV_Day{}
+func getClubRhiz() []EvDay {
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -401,29 +401,29 @@ func get_rhiz() []EV_Day {
 		selection := h.DOM
 		day := strings.TrimSpace(selection.Find("div.event-date").Text())
 		for _, date := range weekendDates {
-			tmp_date := date.Format("020106")
-			if strings.Contains(day, tmp_date) {
+			tmpDate := date.Format("020106")
+			if strings.Contains(day, tmpDate) {
 				splitted := strings.Split(day, " ")
 				if len(splitted) != 3 {
 					fmt.Println("[e] could not parse rhiz info")
 					return
 				}
 				time := splitted[2]
-				sel_title := selection.Find("h3")
-				title := strings.TrimSpace(sel_title.Text())
+				selTitle := selection.Find("h3")
+				title := strings.TrimSpace(selTitle.Text())
 
-				ev_link := selection.Find("a[href]")
-				link, exists := ev_link.Attr("href")
+				evLink := selection.Find("a[href]")
+				link, exists := evLink.Attr("href")
 				url := ""
 				if exists {
 					url = link
 				}
-				event_info := event{
+				eventInfo := event{
 					Title: title,
 					Time:  time,
 					URL:   url,
 				}
-				events = add_event_info(events, "rhiz", date.Weekday().String(), event_info)
+				events = addEventInfo(events, "rhiz", date.Weekday().String(), eventInfo)
 			}
 		}
 	})
@@ -436,8 +436,8 @@ func get_rhiz() []EV_Day {
 	return events
 }
 
-func get_sass() []EV_Day {
-	events := []EV_Day{}
+func getClubSass() []EvDay {
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -448,33 +448,33 @@ func get_sass() []EV_Day {
 		selection := h.DOM
 		day := strings.TrimSpace(selection.Find("span.start_date").Text())
 		for _, date := range weekendDates {
-			tmp_date := monday.Format(date, "2. Jan", monday.LocaleDeDE)
-			if strings.Contains(day, tmp_date) {
+			tmpDate := monday.Format(date, "2. Jan", monday.LocaleDeDE)
+			if strings.Contains(day, tmpDate) {
 
 				start := strings.TrimSpace(selection.Find("span.start_time").Text())
 				end := strings.TrimSpace(selection.Find("span.end_time").Text())
 				title := strings.TrimSpace(selection.Find("div.title").Text())
-				sub_title := strings.TrimSpace(selection.Find("div.subline").Text())
-				if sub_title != "" {
-					sub_title = " " + sub_title
+				subTitle := strings.TrimSpace(selection.Find("div.subline").Text())
+				if subTitle != "" {
+					subTitle = " " + subTitle
 				}
 
-				full_title := fmt.Sprintf("%s%s", title, sub_title)
-				full_time := fmt.Sprintf("%s-%s", start, end)
+				fullTitle := fmt.Sprintf("%s%s", title, subTitle)
+				fullTime := fmt.Sprintf("%s-%s", start, end)
 
-				ev_link := selection.Find("a[href]")
-				link, exists := ev_link.Attr("href")
+				evLink := selection.Find("a[href]")
+				link, exists := evLink.Attr("href")
 				url := ""
 				if exists {
 					url = fmt.Sprintf("https://sassvienna.com%s", link)
 				}
 
-				event_info := event{
-					Title: full_title,
-					Time:  full_time,
+				eventInfo := event{
+					Title: fullTitle,
+					Time:  fullTime,
 					URL:   url,
 				}
-				events = add_event_info(events, "SASS", date.Weekday().String(), event_info)
+				events = addEventInfo(events, "SASS", date.Weekday().String(), eventInfo)
 			}
 		}
 	})
@@ -487,8 +487,8 @@ func get_sass() []EV_Day {
 	return events
 }
 
-func get_b72() []EV_Day {
-	events := []EV_Day{}
+func getClubB72() []EvDay {
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -496,42 +496,42 @@ func get_b72() []EV_Day {
 	})
 
 	coll.OnHTML("div.coming-up", func(h *colly.HTMLElement) {
-		ev_time := ""
+		evTime := ""
 		selection := h.DOM
 		day := strings.TrimSpace(selection.Find("h4").Text())
 		for _, date := range weekendDates {
-			tmp_date := date.Format("02.01")
-			if tmp_date == day {
+			tmpDate := date.Format("02.01")
+			if tmpDate == day {
 				title := selection.Find("h6")
 
-				ev_link := title.Find("a[href]")
-				link, exists := ev_link.Attr("href")
+				evLink := title.Find("a[href]")
+				link, exists := evLink.Attr("href")
 				url := ""
 				if exists {
 					url = fmt.Sprintf("https://www.b72.at%s", link)
 
 					coll.OnHTML("div.show-detail", func(h *colly.HTMLElement) {
-						link_sel := h.DOM
-						link_sel.Find("b:not([class])").Each(func(_ int, s *goquery.Selection) {
-							cur_text := s.Text()
-							splitted := strings.Split(cur_text, " ")
+						linkSel := h.DOM
+						linkSel.Find("b:not([class])").Each(func(_ int, s *goquery.Selection) {
+							curText := s.Text()
+							splitted := strings.Split(curText, " ")
 							if len(splitted) != 2 {
 								fmt.Println("[e] could not parse b72 time")
 								return
 							}
-							ev_time = splitted[1]
+							evTime = splitted[1]
 						})
 					})
 					coll.Visit(h.Request.AbsoluteURL(link))
 				}
-				title_text := strings.TrimSpace(title.Text())
+				titleText := strings.TrimSpace(title.Text())
 
-				event_info := event{
-					Title: title_text,
-					Time:  ev_time,
+				eventInfo := event{
+					Title: titleText,
+					Time:  evTime,
 					URL:   url,
 				}
-				events = add_event_info(events, "B72", date.Weekday().String(), event_info)
+				events = addEventInfo(events, "B72", date.Weekday().String(), eventInfo)
 			}
 		}
 	})
@@ -544,8 +544,8 @@ func get_b72() []EV_Day {
 	return events
 }
 
-func get_freytag(club string) []EV_Day {
-	events := []EV_Day{}
+func getClubFreytag(club string) []EvDay {
+	events := []EvDay{}
 
 	coll := colly.NewCollector()
 	coll.OnRequest(func(req *colly.Request) {
@@ -557,27 +557,27 @@ func get_freytag(club string) []EV_Day {
 		day := strings.TrimSpace(selection.Find("span.listKalender_EventDate__hz06c").Text())
 		time := strings.TrimSpace(selection.Find("div.listKalender_EventTime__3Xw8c").Text())
 		title := strings.TrimSpace(selection.Find("h2").Text())
-		sub_title := strings.TrimSpace(selection.Find("h3").Text())
-		if sub_title != "" {
-			sub_title = " " + sub_title
+		subTitle := strings.TrimSpace(selection.Find("h3").Text())
+		if subTitle != "" {
+			subTitle = " " + subTitle
 		}
 
-		ev_link := selection.Find("a[href]")
-		link, exists := ev_link.Attr("href")
+		evLink := selection.Find("a[href]")
+		link, exists := evLink.Attr("href")
 		url := ""
 		if exists {
 			url = fmt.Sprintf("https://frey-tag.at%s", link)
 		}
 		location := strings.TrimSpace(selection.Find("span.listKalender_EventLocation__2vPrT").Text())
 		for _, date := range weekendDates {
-			tmp_date := date.Format("02.01.2006")
-			if day == tmp_date {
-				event_info := event{
-					Title: fmt.Sprintf("%s%s", title, sub_title),
+			tmpDate := date.Format("02.01.2006")
+			if day == tmpDate {
+				eventInfo := event{
+					Title: fmt.Sprintf("%s%s", title, subTitle),
 					Time:  time,
 					URL:   url,
 				}
-				events = add_event_info(events, location, date.Weekday().String(), event_info)
+				events = addEventInfo(events, location, date.Weekday().String(), eventInfo)
 			}
 		}
 	})
@@ -590,58 +590,58 @@ func get_freytag(club string) []EV_Day {
 	return events
 }
 
-func get_all_events() events {
-	cur_events := events{}
+func getAllEvents() events {
+	currentEvents := events{}
 
-	eventChan := make(chan []EV_Day)
+	eventChan := make(chan []EvDay)
 
-	functions := []func() []EV_Day{
-		get_fish,
-		get_flex,
-		get_werk,
-		get_loft,
+	functions := []func() []EvDay{
+		getClubFish,
+		getClubFlex,
+		getClubWerk,
+		getClubLoft,
 		// get_black,
-		get_rhiz,
-		get_sass,
-		get_b72,
+		getClubRhiz,
+		getClubSass,
+		getClubB72,
 	}
 
 	// run funcs in goroutine without argument
 	for _, fn := range functions {
-		go func(f func() []EV_Day) {
+		go func(f func() []EvDay) {
 			eventChan <- f()
 		}(fn)
 	}
 
 	// run freytag separate since it has args -> also as gorotines
-	frey_clubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen", "o-der-klub", "pratersauna", "jolly-roger", "club-exil"}
-	for _, club_name := range frey_clubs {
+	freyClubs := []string{"club-praterstrasse", "ponyhof", "club-u", "kramladen", "o-der-klub", "pratersauna", "jolly-roger", "club-exil"}
+	for _, clubName := range freyClubs {
 		go func(club string) {
-			eventChan <- get_freytag(club)
-		}(club_name)
+			eventChan <- getClubFreytag(club)
+		}(clubName)
 	}
 
 	// run freytag separate since it has args -> also as gorotines
-	flucc_locations := []string{"Wanne", "Deck"}
-	for _, location := range flucc_locations {
+	fluccLocations := []string{"Wanne", "Deck"}
+	for _, location := range fluccLocations {
 		go func(loc string) {
-			eventChan <- get_flucc(loc)
+			eventChan <- getClubFlucc(loc)
 		}(location)
 	}
 
-	for i := 0; i < len(functions)+len(frey_clubs)+len(flucc_locations); i++ {
-		cur_events.Events = append(cur_events.Events, <-eventChan...)
+	for i := 0; i < len(functions)+len(freyClubs)+len(fluccLocations); i++ {
+		currentEvents.Events = append(currentEvents.Events, <-eventChan...)
 	}
 
-	return cur_events
+	return currentEvents
 
 }
 
 func main() {
 	weekendDates = getWeekendDates()
-	cur_events := get_all_events()
+	curretnEvents := getAllEvents()
 
-	content, err := json.MarshalIndent(cur_events, "", "  ")
+	content, err := json.MarshalIndent(curretnEvents, "", "  ")
 	if err != nil {
 		fmt.Println(err)
 	}
