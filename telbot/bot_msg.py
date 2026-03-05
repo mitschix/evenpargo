@@ -48,7 +48,6 @@ Via their own website:
 - [Flex](https://flex.at/events/monat/)
 - [Fluc Wanne](https://flucc.at/)
 - [Grelle Forelle](https://www.grelleforelle.com/programm/)
-- [Rhiz](https://rhiz.wien/programm/)
 - [SASS](https://sassvienna.com/programm)
 - [dasWerk](https://www.daswerk.org/programm/)
 - [theLoft](https://www.theloft.at/programm/)

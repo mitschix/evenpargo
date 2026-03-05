@@ -389,53 +389,6 @@ func getClubBlack() []EvDay { //lint:ignore U1000
 	return events
 }
 
-func getClubRhiz() []EvDay {
-	events := []EvDay{}
-
-	coll := colly.NewCollector()
-	coll.OnRequest(func(req *colly.Request) {
-		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
-	})
-
-	coll.OnHTML("div.grid-item", func(h *colly.HTMLElement) {
-		selection := h.DOM
-		day := strings.TrimSpace(selection.Find("div.event-date").Text())
-		for _, date := range weekendDates {
-			tmpDate := date.Format("020106")
-			if strings.Contains(day, tmpDate) {
-				splitted := strings.Split(day, " ")
-				if len(splitted) != 3 {
-					fmt.Println("[e] could not parse rhiz info")
-					return
-				}
-				time := splitted[2]
-				selTitle := selection.Find("h3")
-				title := strings.TrimSpace(selTitle.Text())
-
-				evLink := selection.Find("a[href]")
-				link, exists := evLink.Attr("href")
-				url := ""
-				if exists {
-					url = link
-				}
-				eventInfo := event{
-					Title: title,
-					Time:  time,
-					URL:   url,
-				}
-				events = addEventInfo(events, "rhiz", date.Weekday().String(), eventInfo)
-			}
-		}
-	})
-
-	coll.OnError(func(r *colly.Response, err error) {
-		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
-	})
-
-	coll.Visit("https://rhiz.wien")
-	return events
-}
-
 func getClubSass() []EvDay {
 	events := []EvDay{}
 
@@ -601,7 +554,6 @@ func getAllEvents() events {
 		getClubWerk,
 		getClubLoft,
 		// get_black,
-		getClubRhiz,
 		getClubSass,
 		getClubB72,
 	}
