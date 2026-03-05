@@ -184,7 +184,7 @@ func getClubFlex() []EvDay {
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
 	})
 
-	coll.OnHTML("div.tribe-events-calendar-month__day", func(h *colly.HTMLElement) {
+	coll.OnHTML("td.tribe-events-calendar-month__day", func(h *colly.HTMLElement) {
 		selection := h.DOM
 		for _, date := range weekendDates {
 			tmpDate := date.Format("2006-01-02")
@@ -195,7 +195,7 @@ func getClubFlex() []EvDay {
 							time := strings.TrimSpace(sel_art.Find("div.tribe-events-calendar-month__calendar-event-datetime").Text())
 							time = strings.ReplaceAll(time, "\t", "")
 							time = strings.ReplaceAll(time, "\n", "")
-							selTitle := sel_art.Find("h3.tribe-events-calendar-month__calendar-event-title")
+							selTitle := sel_art.Find("div.tribe-events-calendar-month__calendar-event-title")
 
 							evLink := selTitle.Find("a[href]")
 							link, exists := evLink.Attr("href")
