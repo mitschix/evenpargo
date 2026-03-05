@@ -432,7 +432,7 @@ func getClubRhiz() []EvDay {
 		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
 	})
 
-	coll.Visit("https://rhiz.wien/programm/")
+	coll.Visit("https://rhiz.wien")
 	return events
 }
 
