@@ -256,39 +256,29 @@ func getClubWerk() []EvDay {
 		// fmt.Println(fmt.Printf("Visiting %s", req.URL))
 	})
 
-	coll.OnHTML("div.events--preview-item", func(h *colly.HTMLElement) {
-		evDay := ""
-		selection := h.DOM
-		title := strings.TrimSpace(selection.Find(".preview-item--headline").Text())
-		evLink := selection.Find(".preview-item--link")
-		link, exists := evLink.Attr("href")
-		url := ""
-		if exists {
-			url = link
-		}
-		day := selection.Find("ul.preview-item--information").Find("li:not([class])").First().Text()
-		time := selection.Find("ul.preview-item--information").Find("li:not([class])").Eq(1).Text()
-		time = strings.ReplaceAll(time, " Uhr", "")
-		switch {
-		case strings.HasPrefix(day, "Freitag"):
-			evDay = "Friday"
-		case strings.HasPrefix(day, "Samstag"):
-			evDay = "Saturday"
-		case strings.HasPrefix(day, "Sonntag"):
-			evDay = "Sunday"
-		default:
-		}
+	coll.OnHTML("div.grid", func(h *colly.HTMLElement) {
+		elem := h.DOM
 		for _, date := range weekendDates {
-			tmpDate := monday.Format(date, "02. January", monday.LocaleDeDE)
-			tmpDate = fixDate(tmpDate)
-			if evDay == date.Weekday().String() && strings.Contains(day, tmpDate) {
-				eventInfo := event{
-					Title: title,
-					Time:  time,
-					URL:   url,
+			tmpDate := date.Format("02.01.")
+
+			elem.Find("div.shrink-0").Each(func(_ int, day *goquery.Selection) {
+				dateTime := day.Find("p").First().Text()
+				if strings.Contains(dateTime, tmpDate) {
+					title := day.Find("p").Eq(1).Text()
+					splitted := strings.Split(dateTime, " // ")
+					if len(splitted) != 2 {
+						fmt.Println("[e] could not parse werk info")
+						return
+					}
+					_, time := splitted[0], splitted[1]
+					eventInfo := event{
+						Title: title,
+						Time:  time,
+						URL:   "https://www.daswerk.org/program/",
+					}
+					events = addEventInfo(events, "dasWerk", date.Weekday().String(), eventInfo)
 				}
-				events = addEventInfo(events, "dasWerk", date.Weekday().String(), eventInfo)
-			}
+			})
 		}
 
 	})
@@ -297,7 +287,7 @@ func getClubWerk() []EvDay {
 		fmt.Printf("Error on '%s': %s", r.Request.URL, err.Error())
 	})
 
-	coll.Visit("https://www.daswerk.org/programm/")
+	coll.Visit("https://www.daswerk.org/program/")
 	return events
 }
 
